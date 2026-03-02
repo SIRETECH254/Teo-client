@@ -15,11 +15,13 @@ function App() {
         <a href="https://react.dev" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
+
+        <p className='text-3xl font-bold underline text-red-500'>Hello World</p>
       </div>
       <h1>Vite + React</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+          count is {count} 
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
