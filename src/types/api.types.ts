@@ -49,6 +49,30 @@ export interface GoogleAuthMobilePayload {
 // ============================================
 // User Types
 // ============================================
+
+export interface IRole {
+  id: string;
+  name: string;
+  displayName?: string;
+  description?: string;
+  permissions?: string[];
+  isActive?: boolean;
+}
+
+export interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  roles: IRole[];
+  isVerified: boolean;
+  country?: string;
+  timezone?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface UpdateProfilePayload {
   name?: string;
   phone?: string;
