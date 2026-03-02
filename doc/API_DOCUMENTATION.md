@@ -143,6 +143,18 @@ The system uses a unified user model with roles:
     "phone": "string" // Optional, either email or phone required
   }
   ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "OTP has been resent to your email and phone",
+    "data": {
+      "userId": "string",
+      "email": "string",
+      "otpExpiry": "2026-01-22T00:00:00.000Z"
+    }
+  }
+  ```
 
 #### Login
 - **Endpoint:** `POST /auth/login`
@@ -181,6 +193,13 @@ The system uses a unified user model with roles:
 - **Endpoint:** `POST /auth/logout`
 - **Description:** Logout user and invalidate tokens
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Logout successful"
+  }
+  ```
 
 #### Forgot Password
 - **Endpoint:** `POST /auth/forgot-password`
@@ -192,6 +211,13 @@ The system uses a unified user model with roles:
     "email": "string"
   }
   ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Password reset instructions sent to your email and phone"
+  }
+  ```
 
 #### Reset Password
 - **Endpoint:** `POST /auth/reset-password/:token`
@@ -201,6 +227,13 @@ The system uses a unified user model with roles:
   ```json
   {
     "newPassword": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Password reset successfully"
   }
   ```
 
@@ -230,6 +263,23 @@ The system uses a unified user model with roles:
 - **Endpoint:** `GET /auth/me`
 - **Description:** Get current authenticated user profile
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "user": {
+        "id": "string",
+        "name": "string",
+        "email": "string",
+        "phone": "string",
+        "avatar": "string",
+        "roles": [],
+        "isVerified": true
+      }
+    }
+  }
+  ```
 
 #### Google Auth
 - **Endpoint:** `GET /auth/google`
@@ -277,6 +327,23 @@ The system uses a unified user model with roles:
 - **Endpoint:** `GET /users/profile`
 - **Description:** Get current user profile
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "user": {
+        "id": "string",
+        "name": "string",
+        "email": "string",
+        "phone": "string",
+        "avatar": "string",
+        "country": "string",
+        "timezone": "string"
+      }
+    }
+  }
+  ```
 
 #### Update Own Profile
 - **Endpoint:** `PUT /users/profile`
@@ -287,12 +354,19 @@ The system uses a unified user model with roles:
   {
     "name": "string",
     "phone": "string",
-    "avatar": "string",
+    "avatar": "string | null", // null to remove avatar
     "country": "string",
     "timezone": "string"
   }
   ```
 - **Content-Type:** `application/json` or `multipart/form-data` (for avatar upload)
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Profile updated successfully"
+  }
+  ```
 
 #### Change Password
 - **Endpoint:** `PUT /users/change-password`
@@ -305,11 +379,34 @@ The system uses a unified user model with roles:
     "newPassword": "string"
   }
   ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Password changed successfully"
+  }
+  ```
 
 #### Get Notification Preferences
 - **Endpoint:** `GET /users/notifications`
 - **Description:** Get notification preferences
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "notificationPreferences": {
+        "email": true,
+        "sms": true,
+        "inApp": true,
+        "orderUpdates": true,
+        "promotions": false,
+        "stockAlerts": false
+      }
+    }
+  }
+  ```
 
 #### Update Notification Preferences
 - **Endpoint:** `PUT /users/notifications`
@@ -318,12 +415,19 @@ The system uses a unified user model with roles:
 - **Request Body:**
   ```json
   {
-    "email": "boolean",
-    "sms": "boolean",
-    "inApp": "boolean",
-    "orderUpdates": "boolean",
-    "promotions": "boolean",
-    "stockAlerts": "boolean"
+    "email": true,
+    "sms": false,
+    "inApp": true,
+    "orderUpdates": true,
+    "promotions": false,
+    "stockAlerts": false
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Notification preferences updated successfully"
   }
   ```
 
@@ -412,11 +516,136 @@ The system uses a unified user model with roles:
   - `category` - Filter by category
   - `collection` - Filter by collection
   - `status` - Filter by status (active/draft/archived)
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Products retrieved successfully",
+    "data": [
+      {
+        "_id": "65e26b1c09b068c201383816",
+        "title": "Classic White Sneaker",
+        "slug": "classic-white-sneaker",
+        "description": "A comfortable and stylish sneaker",
+        "shortDescription": "Comfortable and stylish",
+        "brand": null,
+        "images": [
+          {
+            "url": "https://res.cloudinary.com/example/image1.jpg",
+            "alt": "Classic White Sneaker Front",
+            "isPrimary": true,
+            "_id": "65e26b1c09b068c201383817"
+          }
+        ],
+        "categories": [],
+        "collections": [],
+        "tags": [],
+        "basePrice": 1500,
+        "comparePrice": 1800,
+        "variants": [],
+        "skus": [
+          {
+            "attributes": [],
+            "price": 1500,
+            "stock": 100,
+            "skuCode": "CWS-DEFAULT",
+            "isActive": true,
+            "allowPreOrder": false,
+            "preOrderStock": 0,
+            "lowStockThreshold": 5,
+            "_id": "65e26b1c09b068c201383818"
+          }
+        ],
+        "status": "active",
+        "metaTitle": "Classic White Sneaker for Sale",
+        "metaDescription": "Buy the best classic white sneakers",
+        "trackInventory": true,
+        "weight": 500,
+        "features": ["Comfortable", "Durable"],
+        "createdBy": "65e26b1c09b068c201383800",
+        "createdAt": "2026-02-15T10:00:00.000Z",
+        "updatedAt": "2026-02-15T10:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalDocs": 1,
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  }
+  ```
 
 #### Get Product by ID
 - **Endpoint:** `GET /products/:id`
 - **Description:** Get single product details with populated variants and categories
 - **Auth Required:** No
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Product retrieved successfully",
+    "data": {
+      "_id": "65e26b1c09b068c201383816",
+      "title": "Classic White Sneaker",
+      "slug": "classic-white-sneaker",
+      "description": "A comfortable and stylish sneaker",
+      "shortDescription": "Comfortable and stylish",
+      "brand": {
+        "_id": "65e26b1c09b068c201383809",
+        "name": "Nike"
+      },
+      "images": [
+        {
+          "url": "https://res.cloudinary.com/example/image1.jpg",
+          "alt": "Classic White Sneaker Front",
+          "isPrimary": true,
+          "_id": "65e26b1c09b068c201383817",
+          "public_id": "teo-kicks/products/image1"
+        }
+      ],
+      "categories": [
+        {
+          "_id": "65e26b1c09b068c201383810",
+          "name": "Footwear"
+        }
+      ],
+      "collections": [],
+      "tags": [],
+      "basePrice": 1500,
+      "comparePrice": 1800,
+      "variants": [],
+      "skus": [
+        {
+          "attributes": [],
+          "price": 1500,
+          "stock": 100,
+          "skuCode": "CWS-DEFAULT",
+          "isActive": true,
+          "allowPreOrder": false,
+          "preOrderStock": 0,
+          "lowStockThreshold": 5,
+          "_id": "65e26b1c09b068c201383818"
+        }
+      ],
+      "status": "active",
+      "metaTitle": "Classic White Sneaker for Sale",
+      "metaDescription": "Buy the best classic white sneakers",
+      "trackInventory": true,
+      "weight": 500,
+      "features": ["Comfortable", "Durable"],
+      "createdBy": {
+        "_id": "65e26b1c09b068c201383800",
+        "name": "Admin User",
+        "email": "admin@example.com"
+      },
+      "createdAt": "2026-02-15T10:00:00.000Z",
+      "updatedAt": "2026-02-15T10:00:00.000Z"
+    }
+  }
+  ```
 
 #### Create Product
 - **Endpoint:** `POST /products`
@@ -523,6 +752,29 @@ The system uses a unified user model with roles:
 - **Query Parameters:**
   - `width` - Image width (default: 800)
   - `height` - Image height (default: 800)
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "images": [
+        {
+          "url": "https://res.cloudinary.com/example/image1.jpg",
+          "alt": "Classic White Sneaker Front",
+          "isPrimary": true,
+          "public_id": "teo-kicks/products/image1",
+          "_id": "65e26b1c09b068c201383817",
+          "optimized": "https://res.cloudinary.com/example/image/upload/c_fill,h_800,w_800/teo-kicks/products/image1.jpg",
+          "responsive": {
+            "small": "https://res.cloudinary.com/example/image/upload/c_fill,w_400/teo-kicks/products/image1.jpg",
+            "medium": "https://res.cloudinary.com/example/image/upload/c_fill,w_800/teo-kicks/products/image1.jpg",
+            "large": "https://res.cloudinary.com/example/image/upload/c_fill,w_1200/teo-kicks/products/image1.jpg"
+          }
+        }
+      ]
+    }
+  }
+  ```
 
 ---
 
@@ -748,6 +1000,45 @@ The system uses a unified user model with roles:
 - **Endpoint:** `GET /cart`
 - **Description:** Get current user's active cart
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "_id": "65e26b1c09b068c201383814",
+      "userId": "65e26b1c09b068c201383812",
+      "items": [
+        {
+          "_id": "65e26b1c09b068c201383815",
+          "productId": {
+            "_id": "65e26b1c09b068c201383816",
+            "title": "Classic White Sneaker",
+            "images": [],
+            "primaryImage": "https://example.com/image.jpg",
+            "slug": "classic-white-sneaker",
+            "skus": [],
+            "variants": []
+          },
+          "skuId": "65e26b1c09b068c201383817",
+          "quantity": 1,
+          "price": 1500,
+          "variantOptions": {
+            "Size": "M",
+            "Color": "White"
+          },
+          "createdAt": "2026-02-15T10:00:00.000Z",
+          "updatedAt": "2026-02-15T10:00:00.000Z"
+        }
+      ],
+      "totalAmount": 1500,
+      "totalItems": 1,
+      "status": "active",
+      "expiresAt": "2026-03-17T10:00:00.000Z",
+      "createdAt": "2026-02-15T10:00:00.000Z",
+      "updatedAt": "2026-02-15T10:00:00.000Z"
+    }
+  }
+  ```
 
 #### Add to Cart
 - **Endpoint:** `POST /cart`
@@ -758,8 +1049,44 @@ The system uses a unified user model with roles:
   {
     "productId": "string",
     "skuId": "string",
-    "quantity": "number",
-    "variantOptions": {}
+    "quantity": 1,
+    "variantOptions": {
+      "Color": "Red",
+      "Size": "M"
+    }
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Item added to cart successfully",
+    "data": {
+      "_id": "65e26b1c09b068c201383814",
+      "userId": "65e26b1c09b068c201383812",
+      "items": [
+        {
+          "_id": "65e26b1c09b068c201383815",
+          "productId": {
+            "_id": "65e26b1c09b068c201383816",
+            "title": "Classic White Sneaker",
+            "images": [],
+            "primaryImage": "https://example.com/image.jpg",
+            "slug": "classic-white-sneaker",
+            "skus": []
+          },
+          "skuId": "65e26b1c09b068c201383817",
+          "quantity": 1,
+          "price": 1500,
+          "variantOptions": {
+            "Size": "M",
+            "Color": "White"
+          }
+        }
+      ],
+      "totalAmount": 1500,
+      "totalItems": 1
+    }
   }
   ```
 
@@ -788,6 +1115,19 @@ The system uses a unified user model with roles:
 - **Endpoint:** `POST /cart/validate`
 - **Description:** Validate cart items (check stock, prices)
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "isValid": true,
+      "errors": [],
+      "warnings": [
+        "Low stock for CWS-DEFAULT. Only 5 remaining"
+      ]
+    }
+  }
+  ```
 
 ---
 
@@ -842,11 +1182,115 @@ The system uses a unified user model with roles:
   - `type` - Filter by type (pickup/delivery)
   - `location` - Filter by location (in_shop/away)
   - `q` - Search by invoice number
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "orders": [
+        {
+          "_id": "65e26b1c09b068c201383820",
+          "createdAt": "2026-02-15T10:30:00.000Z",
+          "status": "PLACED",
+          "paymentStatus": "UNPAID",
+          "pricing": {
+            "subtotal": 1500,
+            "discounts": 0,
+            "packagingFee": 50,
+            "schedulingFee": 0,
+            "deliveryFee": 0,
+            "tax": 0,
+            "total": 1550
+          },
+          "invoice": {
+            "_id": "65e26b1c09b068c201383821",
+            "number": "INV-2026-123456"
+          },
+          "customer": {
+            "_id": "65e26b1c09b068c201383812",
+            "name": "John Doe",
+            "email": "john@example.com"
+          }
+        }
+      ],
+      "pagination": {
+        "currentPage": 1,
+        "pageSize": 10,
+        "totalItems": 1,
+        "totalPages": 1
+      }
+    }
+  }
+  ```
 
 #### Get Order by ID
 - **Endpoint:** `GET /orders/:id`
 - **Description:** Get single order details
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "order": {
+        "_id": "65e26b1c09b068c201383820",
+        "customerId": {
+          "_id": "65e26b1c09b068c201383812",
+          "name": "John Doe",
+          "email": "john@example.com",
+          "phone": "+254712345678"
+        },
+        "createdBy": "65e26b1c09b068c201383812",
+        "location": "in_shop",
+        "type": "pickup",
+        "items": [
+          {
+            "skuId": "65e26b1c09b068c201383813",
+            "productId": {
+              "_id": "65e26b1c09b068c201383814",
+              "title": "Classic White Sneaker",
+              "primaryImage": "https://example.com/image.jpg",
+              "images": [],
+              "basePrice": 1500
+            },
+            "title": "Classic White Sneaker",
+            "variantOptions": {},
+            "quantity": 1,
+            "unitPrice": 1500
+          }
+        ],
+        "pricing": {
+          "subtotal": 1500,
+          "discounts": 0,
+          "packagingFee": 50,
+          "schedulingFee": 0,
+          "deliveryFee": 0,
+          "tax": 0,
+          "total": 1550
+        },
+        "timing": {
+          "isScheduled": false,
+          "scheduledAt": null
+        },
+        "addressId": null,
+        "paymentPreference": {
+          "mode": "cash",
+          "method": null
+        },
+        "status": "PLACED",
+        "paymentStatus": "UNPAID",
+        "invoiceId": {
+          "_id": "65e26b1c09b068c201383821",
+          "number": "INV-2026-123456"
+        },
+        "receiptId": null,
+        "metadata": {},
+        "createdAt": "2026-02-15T10:30:00.000Z",
+        "updatedAt": "2026-02-15T10:30:00.000Z"
+      }
+    }
+  }
+  ```
 
 #### Update Order Status
 - **Endpoint:** `PATCH /orders/:id/status`
@@ -914,6 +1358,36 @@ The system uses a unified user model with roles:
 - **Endpoint:** `GET /addresses`
 - **Description:** Get all addresses for current user
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "addresses": [
+        {
+          "_id": "65e26b1c09b068c201383822",
+          "userId": "65e26b1c09b068c201383812",
+          "name": "Home",
+          "coordinates": {
+            "lat": -1.2921,
+            "lng": 36.8219
+          },
+          "regions": {
+            "country": "Kenya",
+            "locality": "Nairobi",
+            "sublocality": "Westlands",
+            "administrative_area_level_1": "Nairobi County"
+          },
+          "address": "123 Main Street, Westlands, Nairobi",
+          "details": "Apartment 4B",
+          "isDefault": true,
+          "createdAt": "2026-02-15T10:00:00.000Z",
+          "updatedAt": "2026-02-15T10:00:00.000Z"
+        }
+      ]
+    }
+  }
+  ```
 
 #### Get Address by ID
 - **Endpoint:** `GET /addresses/:addressId`
@@ -978,6 +1452,49 @@ The system uses a unified user model with roles:
   - `page` - Page number
   - `limit` - Items per page
   - `rating` - Filter by rating (1-5)
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "reviews": [
+        {
+          "_id": "65e26b1c09b068c201383823",
+          "user": {
+            "_id": "65e26b1c09b068c201383812",
+            "name": "John Doe",
+            "email": "john@example.com",
+            "avatar": "https://example.com/avatar.jpg"
+          },
+          "product": "65e26b1c09b068c201383816",
+          "rating": 5,
+          "comment": "Great product! Very comfortable.",
+          "isVerifiedPurchase": false,
+          "createdAt": "2026-02-15T10:00:00.000Z",
+          "updatedAt": "2026-02-15T10:00:00.000Z"
+        }
+      ],
+      "pagination": {
+        "currentPage": 1,
+        "totalPages": 1,
+        "totalReviews": 1,
+        "hasNextPage": false,
+        "hasPrevPage": false
+      },
+      "stats": {
+        "averageRating": 5,
+        "totalReviews": 1,
+        "ratingDistribution": {
+          "5": 1,
+          "4": 0,
+          "3": 0,
+          "2": 0,
+          "1": 0
+        }
+      }
+    }
+  }
+  ```
 
 #### Create Review
 - **Endpoint:** `POST /reviews`
@@ -1099,6 +1616,15 @@ The system uses a unified user model with roles:
 - **Endpoint:** `GET /notifications/unread-count`
 - **Description:** Get unread notification count
 - **Auth Required:** Yes
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "unreadCount": 5
+    }
+  }
+  ```
 
 #### Get Notification by ID
 - **Endpoint:** `GET /notifications/:notificationId`
@@ -1241,60 +1767,219 @@ The API client automatically handles:
 
 ## Integrations
 
-The API integration layer consists of two main files:
+The API integration layer consists of two main files that work together to provide a type-safe, centralized API client for the TEO KICKS e-commerce application.
 
-### `api/config.ts`
+### `src/api/config.ts`
 
-This file contains the Axios instance configuration with interceptors:
+This file sets up the base Axios instance with authentication and error handling interceptors. It serves as the foundation for all API calls in the application.
 
-**Features:**
-- Creates an Axios instance with base URL from `VITE_API_URL` environment variable
-- **Request Interceptor:**
-  - Automatically adds `Authorization: Bearer <accessToken>` header from localStorage
-  - Handles FormData by removing Content-Type header (browser sets multipart boundary automatically)
-- **Response Interceptor:**
-  - Handles 401 Unauthorized responses
-  - Automatically attempts token refresh using refresh token from localStorage
-  - Retries the original request after successful token refresh
-  - Rejects promise if token refresh fails
+#### Configuration Details
+
+**Base Setup:**
+```typescript
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+const api: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+```
+
+**Request Interceptor:**
+The request interceptor automatically handles authentication and file uploads:
+
+1. **Authentication Token Injection:**
+   - Retrieves `accessToken` from `localStorage`
+   - Automatically adds `Authorization: Bearer <token>` header to all requests
+   - Only adds token if it exists (allows public endpoints)
+
+2. **FormData Handling:**
+   - Detects when request body is `FormData` (for file uploads)
+   - Removes `Content-Type` header to let browser set it with proper boundary
+   - Essential for multipart/form-data uploads (product images, avatars)
+
+**Response Interceptor:**
+The response interceptor handles token refresh and error recovery:
+
+1. **401 Unauthorized Handling:**
+   - Detects 401 responses (expired access token)
+   - Checks if request hasn't already been retried (`_retry` flag)
+
+2. **Automatic Token Refresh:**
+   - Retrieves `refreshToken` from `localStorage`
+   - Calls `/api/auth/refresh-token` endpoint
+   - Updates `accessToken` and `refreshToken` in `localStorage`
+   - Updates the original request's Authorization header
+   - Retries the original request with new token
+
+3. **Error Propagation:**
+   - If refresh fails, rejects the promise (allows app to handle logout/redirect)
+   - Preserves existing tokens for manual retry scenarios
 
 **Exports:**
-- `api` - The configured Axios instance
-- `API_BASE_URL` - The base URL constant
+- `api` - The configured Axios instance (used by all API modules)
+- `API_BASE_URL` - The base URL constant (for direct axios calls if needed)
 
-### `api/index.ts`
+### `src/api/index.ts`
 
-This file contains domain-specific API modules organized by resource:
+This file organizes all API endpoints into domain-specific modules. It imports the `api` instance from `config.ts` and uses TypeScript types from `../types/api.types` for type safety.
 
-**Structure:**
-- Each resource has its own API module (e.g., `authAPI`, `userAPI`, `productAPI`)
-- All modules use the shared `api` instance from `config.ts`
-- Methods are organized logically by resource
-- TypeScript types are imported from `../types/api.types` (to be created)
+#### Architecture
 
-**Available API Modules:**
-- `authAPI` - Authentication operations (register, login, OTP, OAuth, refresh)
-- `userAPI` - User profile and management operations
-- `productAPI` - Product CRUD and management operations
-- `categoryAPI` - Category management operations
-- `brandAPI` - Brand management operations
-- `collectionAPI` - Collection management operations
-- `tagAPI` - Tag management operations
-- `cartAPI` - Shopping cart operations
-- `orderAPI` - Order management operations
-- `paymentAPI` - Payment processing operations
-- `addressAPI` - Address management operations
-- `reviewAPI` - Product review operations
-- `couponAPI` - Coupon validation and application
-- `packagingAPI` - Packaging option operations
-- `notificationAPI` - Notification operations
-- `contactAPI` - Contact form operations
+**Import Structure:**
+```typescript
+import { api } from './config';
+import type {
+  RegisterPayload,
+  LoginPayload,
+  // ... other types
+} from '../types/api.types';
+```
 
-**Usage:**
+**Module Organization:**
+Each resource has its own API module object containing related methods. All methods use the shared `api` instance, ensuring consistent authentication, error handling, and base URL configuration.
+
+#### Available API Modules
+
+**`authAPI`** - Authentication and authorization
+- `register(userData: RegisterPayload)` - Register new user account
+- `verifyOTP(otpData: VerifyOTPPayload)` - Verify OTP for account activation
+- `resendOTP(emailData: ResendOTPPayload)` - Request new OTP
+- `login(credentials: LoginPayload)` - Login with email/phone and password
+- `logout()` - Logout current session
+- `forgotPassword(data: ForgotPasswordPayload)` - Request password reset email
+- `resetPassword(token: string, data: ResetPasswordPayload)` - Reset password with token
+- `refreshToken(data: RefreshTokenPayload)` - Refresh access token
+- `getMe()` - Get current authenticated user profile
+- `googleAuth()` - Initiate Google OAuth login
+- `googleAuthCallback(data: GoogleAuthCallbackPayload)` - Handle Google OAuth callback
+- `googleAuthMobile(data: GoogleAuthMobilePayload)` - Google OAuth for mobile apps
+
+**`userAPI`** - User profile management
+- `getProfile()` - Get current user profile
+- `updateProfile(profileData: UpdateProfilePayload | FormData)` - Update profile (supports JSON or FormData for avatar)
+- `changePassword(passwordData: ChangePasswordPayload)` - Change user password
+- `getNotificationPreferences()` - Get notification preferences
+- `updateNotificationPreferences(preferences: UpdateNotificationPreferencesPayload)` - Update notification preferences
+
+**`productAPI`** - Product browsing (customer-facing only)
+- `getAllProducts(params?: GetProductsParams)` - Get all products with filtering and pagination
+- `getProductById(productId: string)` - Get single product details
+- `getOptimizedImages(productId: string, params?: GetOptimizedImagesParams)` - Get optimized image URLs
+
+**`categoryAPI`** - Category browsing
+- `getAllCategories(params?: GetCategoriesParams)` - Get all categories with filtering
+- `getCategoryTree()` - Get category tree structure
+- `getCategoryById(categoryId: string)` - Get single category details
+- `getRootCategories()` - Get root categories only
+
+**`brandAPI`** - Brand browsing
+- `getAllBrands(params?: GetBrandsParams)` - Get all brands with filtering
+- `getBrandById(brandId: string)` - Get single brand details
+- `getPopularBrands(params?: GetPopularBrandsParams)` - Get popular brands
+- `getActiveBrands()` - Get active brands only
+
+**`collectionAPI`** - Collection browsing
+- `getAllCollections(params?: GetCollectionsParams)` - Get all collections with filtering
+- `getCollectionById(collectionId: string)` - Get single collection details
+- `getActiveCollections()` - Get active collections only
+
+**`tagAPI`** - Tag browsing
+- `getAllTags(params?: GetTagsParams)` - Get all tags with filtering
+- `getTagById(tagId: string)` - Get single tag details
+- `getPopularTags(params?: GetPopularTagsParams)` - Get popular tags
+
+**`cartAPI`** - Shopping cart operations
+- `getCart()` - Get current user's active cart
+- `addToCart(cartData: AddToCartPayload)` - Add item to cart
+- `updateCartItem(skuId: string, updateData: UpdateCartItemPayload)` - Update cart item quantity
+- `removeFromCart(skuId: string)` - Remove item from cart
+- `clearCart()` - Clear all items from cart
+- `validateCart()` - Validate cart items (check stock, prices)
+
+**`orderAPI`** - Order management (customer-facing)
+- `createOrder(orderData: CreateOrderPayload)` - Create new order from cart
+- `getOrders(params?: GetOrdersParams)` - Get all orders with filtering and pagination
+- `getOrderById(orderId: string)` - Get single order details
+
+**`paymentAPI`** - Payment processing
+- `payInvoice(paymentData: PayInvoicePayload)` - Pay for an invoice
+- `getPaymentById(paymentId: string)` - Get single payment details
+- `queryMpesaStatus(checkoutRequestId: string)` - Query M-Pesa STK Push payment status
+- `queryMpesaByCheckoutId(checkoutRequestId: string)` - Query M-Pesa payment by checkout ID
+
+**`addressAPI`** - Address management
+- `getUserAddresses()` - Get all addresses for current user
+- `getAddressById(addressId: string)` - Get single address details
+- `createAddress(addressData: CreateAddressPayload)` - Create new address
+- `updateAddress(addressId: string, addressData: UpdateAddressPayload)` - Update address
+- `deleteAddress(addressId: string)` - Delete address
+- `setDefaultAddress(addressId: string)` - Set address as default
+- `getDefaultAddress()` - Get user's default address
+
+**`reviewAPI`** - Product reviews
+- `getProductReviews(productId: string, params?: GetReviewsParams)` - Get all reviews for a product
+- `createReview(reviewData: CreateReviewPayload)` - Create a new review
+- `updateReview(reviewId: string, reviewData: UpdateReviewPayload)` - Update own review
+- `deleteReview(reviewId: string)` - Delete own review
+- `getUserReviews(params?: GetReviewsParams)` - Get current user's reviews
+- `getReviewById(reviewId: string)` - Get single review details
+
+**`couponAPI`** - Coupon validation
+- `validateCoupon(couponData: ValidateCouponPayload)` - Validate a coupon code
+- `applyCoupon(couponData: ValidateCouponPayload)` - Apply coupon to order
+
+**`packagingAPI`** - Packaging options
+- `getActivePackaging()` - Get active packaging options
+- `getDefaultPackaging()` - Get default packaging option
+- `getPackagingById(packagingId: string)` - Get single packaging option details
+
+**`notificationAPI`** - Notifications
+- `getNotifications(params?: GetNotificationsParams)` - Get current user's notifications
+- `getUnreadCount()` - Get unread notification count
+- `getNotification(notificationId: string)` - Get single notification details
+- `markAsRead(notificationId: string)` - Mark notification as read
+- `markAllAsRead()` - Mark all notifications as read
+- `deleteNotification(notificationId: string)` - Delete notification
+
+**`contactAPI`** - Contact form
+- `submitMessage(messageData: SubmitContactPayload)` - Submit contact form message
+
+#### How config.ts and index.ts Work Together
+
+1. **`config.ts`** creates and configures the base Axios instance with:
+   - Base URL from environment variable
+   - Request interceptor for authentication
+   - Response interceptor for token refresh
+   - FormData handling for file uploads
+
+2. **`index.ts`** imports the configured `api` instance and:
+   - Organizes endpoints into logical modules
+   - Applies TypeScript types for type safety
+   - Provides a clean, domain-specific API surface
+   - All methods automatically benefit from config.ts interceptors
+
+3. **Usage Flow:**
+   ```typescript
+   // User calls API method
+   await authAPI.login({ email, password });
+   
+   // index.ts uses api from config.ts
+   login: (credentials) => api.post('/api/auth/login', credentials)
+   
+   // config.ts interceptors automatically:
+   // 1. Add Authorization header (request interceptor)
+   // 2. Handle 401 and refresh token (response interceptor)
+   // 3. Retry request with new token
+   ```
+
+**Usage Example:**
 ```typescript
 import { authAPI, productAPI, cartAPI } from '@/api';
 
-// Use the API modules
+// All methods automatically include auth token and handle token refresh
 const response = await authAPI.login({ email, password });
 const products = await productAPI.getAllProducts({ page: 1, limit: 10 });
 const cart = await cartAPI.getCart();
