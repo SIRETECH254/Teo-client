@@ -25,8 +25,6 @@ This document provides comprehensive documentation for TanStack Query (React Que
 13. [Notes](#notes)
 14. [Available Hooks Reference](#available-hooks-reference)
 
----
-
 ## Introduction
 
 TanStack Query (formerly React Query) is a powerful data synchronization library for React applications. It provides:
