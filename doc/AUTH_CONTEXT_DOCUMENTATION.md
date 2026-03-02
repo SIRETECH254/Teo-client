@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive documentation for the AuthContext implementation in the Appointment Admin web application. The AuthContext provides authentication functionality using Redux as the single source of truth (no useReducer), adapted for a React web environment.
+This document provides comprehensive documentation for the AuthContext implementation in the TEO KICKS e-commerce web application. The AuthContext provides authentication functionality using Redux as the single source of truth (no useReducer), adapted for a React web environment.
 
 **Location:** `src/contexts/AuthContext.tsx`
 
@@ -91,13 +91,13 @@ The AuthContext uses the following Redux actions from `src/redux/slices/authSlic
 
 ### State Access
 
-All state is accessed via `useSelector`:
+All state is accessed via `useAppSelector` (typed Redux hooks):
 
 ```typescript
-const user = useSelector((state: RootState) => state.auth.user);
-const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-const isLoading = useSelector((state: RootState) => state.auth.isLoading);
-const error = useSelector((state: RootState) => state.auth.error);
+const user = useAppSelector((state: RootState) => state.auth.user);
+const isAuthenticated = useAppSelector((state: RootState) => state.auth.isAuthenticated);
+const isLoading = useAppSelector((state: RootState) => state.auth.isLoading);
+const error = useAppSelector((state: RootState) => state.auth.error);
 ```
 
 ---
@@ -158,14 +158,14 @@ interface AuthContextValue {
   error: string | null;
 
   // Auth Functions
-  login: (credentials: LoginCredentials) => Promise<AuthResult>;
-  register: (userData: RegisterData) => Promise<AuthResult>;
-  verifyOTP: (otpData: OTPData) => Promise<AuthResult>;
-  resendOTP: (emailData: { email: string }) => Promise<AuthResult>;
+  login: (credentials: LoginPayload) => Promise<AuthResult>;
+  register: (userData: RegisterPayload) => Promise<AuthResult>;
+  verifyOTP: (otpData: VerifyOTPPayload) => Promise<AuthResult>;
+  resendOTP: (emailData: ResendOTPPayload) => Promise<AuthResult>;
   forgotPassword: (email: string) => Promise<AuthResult>;
   resetPassword: (token: string, newPassword: string) => Promise<AuthResult>;
-  updateProfile: (profileData: ProfileData) => Promise<AuthResult>;
-  changePassword: (passwordData: PasswordData) => Promise<AuthResult>;
+  updateProfile: (profileData: UpdateProfilePayload | FormData) => Promise<AuthResult>;
+  changePassword: (passwordData: ChangePasswordPayload) => Promise<AuthResult>;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -175,10 +175,10 @@ interface AuthContextValue {
 
 #### `login(credentials)`
 
-Authenticates a user with email and password.
+Authenticates a user with email/phone and password.
 
 **Parameters:**
-- `credentials: { email: string; password: string }`
+- `credentials: LoginPayload` - Either `{ email: string; password: string }` or `{ phone: string; password: string }`
 
 **Returns:**
 ```typescript
@@ -187,7 +187,12 @@ Promise<{ success: boolean; error?: string }>
 
 **Example:**
 ```typescript
+// Login with email
 const result = await login({ email: 'user@example.com', password: 'password123' });
+
+// Or login with phone
+const result = await login({ phone: '+1234567890', password: 'password123' });
+
 if (result.success) {
   // User is authenticated
 }
@@ -198,35 +203,64 @@ if (result.success) {
 Registers a new user account.
 
 **Parameters:**
-- `userData: { firstName: string; lastName: string; email: string; password: string; phone: string }`
+- `userData: RegisterPayload` - `{ name: string; email: string; phone: string; password: string; role?: string }`
 
 **Returns:**
 ```typescript
 Promise<{ success: boolean; data?: any; error?: string }>
 ```
 
+**Example:**
+```typescript
+const result = await register({
+  name: 'John Doe',
+  email: 'user@example.com',
+  phone: '+1234567890',
+  password: 'password123',
+  role: 'customer' // Optional, defaults to "customer"
+});
+```
+
 #### `verifyOTP(otpData)`
 
-Verifies email OTP and activates account.
+Verifies OTP and activates account. Supports both email and phone verification.
 
 **Parameters:**
-- `otpData: { email: string; otp: string }`
+- `otpData: VerifyOTPPayload` - Either `{ email?: string; otp: string }` or `{ phone?: string; otp: string }`
 
 **Returns:**
 ```typescript
 Promise<{ success: boolean; error?: string }>
 ```
 
+**Example:**
+```typescript
+// Verify with email
+const result = await verifyOTP({ email: 'user@example.com', otp: '123456' });
+
+// Or verify with phone
+const result = await verifyOTP({ phone: '+1234567890', otp: '123456' });
+```
+
 #### `resendOTP(emailData)`
 
-Resends OTP verification email.
+Resends OTP verification. Supports both email and phone.
 
 **Parameters:**
-- `emailData: { email: string }`
+- `emailData: ResendOTPPayload` - Either `{ email?: string }` or `{ phone?: string }`
 
 **Returns:**
 ```typescript
 Promise<{ success: boolean; error?: string }>
+```
+
+**Example:**
+```typescript
+// Resend to email
+await resendOTP({ email: 'user@example.com' });
+
+// Or resend to phone
+await resendOTP({ phone: '+1234567890' });
 ```
 
 #### `forgotPassword(email)`
@@ -256,14 +290,31 @@ Promise<{ success: boolean; error?: string }>
 
 #### `updateProfile(profileData)`
 
-Updates user profile information.
+Updates user profile information. Supports both object and FormData (for file uploads).
 
 **Parameters:**
-- `profileData: { firstName?: string; lastName?: string; phone?: string; avatar?: string }`
+- `profileData: UpdateProfilePayload | FormData` - `{ name?: string; phone?: string; avatar?: string | null; country?: string; timezone?: string }` or `FormData` for file uploads
 
 **Returns:**
 ```typescript
 Promise<{ success: boolean; user?: User; error?: string }>
+```
+
+**Example:**
+```typescript
+// Update with object
+const result = await updateProfile({
+  name: 'John Doe',
+  phone: '+1234567890',
+  country: 'US',
+  timezone: 'America/New_York'
+});
+
+// Or update with FormData (for avatar upload)
+const formData = new FormData();
+formData.append('name', 'John Doe');
+formData.append('avatar', file);
+const result = await updateProfile(formData);
 ```
 
 #### `changePassword(passwordData)`
@@ -308,25 +359,34 @@ Wrap your app with `AuthProvider` in the root:
 
 ```typescript
 // src/main.tsx
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux';
 import { AuthProvider } from './contexts/AuthContext';
+import App from './App';
 
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </PersistGate>
-    </Provider>
-  </BrowserRouter>,
+  <StrictMode>
+    <BrowserRouter>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </PersistGate>
+      </Provider>
+    </BrowserRouter>
+  </StrictMode>,
 );
 ```
 
 ### 2. Using Auth in Components
 
 ```typescript
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 function MyComponent() {
   const { user, isAuthenticated, login, logout } = useAuth();
@@ -347,7 +407,7 @@ function MyComponent() {
   return (
     <div>
       {isAuthenticated ? (
-        <span>Welcome, {user?.firstName}!</span>
+        <span>Welcome, {user?.name}!</span>
       ) : (
         <button onClick={handleLogin}>Login</button>
       )}
@@ -361,7 +421,7 @@ function MyComponent() {
 Use the auth state to protect routes:
 
 ```typescript
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -386,7 +446,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 ### Login Flow
 
 ```typescript
+import { useNavigate } from 'react-router-dom';
 const { login, isLoading, error } = useAuth();
+const navigate = useNavigate();
 
 const handleLogin = async (email: string, password: string) => {
   const result = await login({ email, password });
@@ -399,25 +461,48 @@ const handleLogin = async (email: string, password: string) => {
     console.error('Login failed:', result.error);
   }
 };
+
+// Or login with phone
+const handleLoginWithPhone = async (phone: string, password: string) => {
+  const result = await login({ phone, password });
+  if (result.success) {
+    navigate('/dashboard');
+  }
+};
 ```
 
 ### Registration Flow
 
 ```typescript
+import { useNavigate } from 'react-router-dom';
 const { register, verifyOTP, resendOTP } = useAuth();
+const navigate = useNavigate();
 
 // Step 1: Register
-const handleRegister = async (userData) => {
-  const result = await register(userData);
+const handleRegister = async () => {
+  const result = await register({
+    name: 'John Doe',
+    email: 'user@example.com',
+    phone: '+1234567890',
+    password: 'password123',
+  });
   if (result.success) {
     // Show OTP input screen
     setShowOTP(true);
   }
 };
 
-// Step 2: Verify OTP
+// Step 2: Verify OTP (with email or phone)
 const handleVerifyOTP = async (email: string, otp: string) => {
   const result = await verifyOTP({ email, otp });
+  if (result.success) {
+    navigate('/dashboard');
+  }
+};
+
+// Or verify with phone
+const handleVerifyOTPWithPhone = async (phone: string, otp: string) => {
+  const result = await verifyOTP({ phone, otp });
   if (result.success) {
     navigate('/dashboard');
   }
@@ -552,21 +637,31 @@ const handleLogin = async () => {
 ### User Type
 
 ```typescript
-interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
+interface IUser {
+  id: string;
+  name: string;
   email: string;
-  phone?: string;
+  phone: string;
   avatar?: string;
-  roles: Role[];
-  isActive: boolean;
-  isEmailVerified: boolean;
-  isPhoneVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
+  roles: IRole[];
+  isVerified: boolean;
+  country?: string;
+  timezone?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface IRole {
+  id: string;
+  name: string;
+  displayName?: string;
+  description?: string;
+  permissions?: string[];
+  isActive?: boolean;
 }
 ```
+
+**Note:** The `User` type in Redux is aliased to `IUser` from `src/types/api.types.ts`.
 
 ### Auth Result Type
 
@@ -593,4 +688,5 @@ interface AuthResult {
 ---
 
 **Last Updated:** February 2026  
-**Version:** 1.0.0
+**Version:** 1.0.0  
+**Project:** TEO KICKS E-Commerce Application
