@@ -6,12 +6,13 @@ import {
   useDeleteAddress,
   useSetDefaultAddress,
 } from '../../../tanstack/useAddresses';
-import { FiMapPin, FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
+import { FiMapPin, FiPlus, FiEdit2, FiTrash2, FiCheck, FiX, FiAlertCircle } from 'react-icons/fi';
 import type { CreateAddressPayload, UpdateAddressPayload } from '../../../types/api.types';
+import type { AxiosError } from 'axios';
 
 // Address management page component
 const Addresses = () => {
-  const { data: addresses, isLoading } = useGetUserAddresses();
+  const { data: addresses, isLoading, isError, error } = useGetUserAddresses();
   const createAddress = useCreateAddress();
   const updateAddress = useUpdateAddress();
   const deleteAddress = useDeleteAddress();
@@ -187,12 +188,55 @@ const Addresses = () => {
     }
   };
 
+  // Show skeleton loader while fetching addresses
   if (isLoading) {
     return (
       <div className="page-container py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+          <div className="flex items-center justify-between mb-6">
+            <div className="h-9 bg-gray-200 rounded w-40 animate-pulse"></div>
+            <div className="h-10 bg-gray-200 rounded w-40 animate-pulse"></div>
+          </div>
+          {/* Address cards skeleton */}
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+                    <div className="h-5 bg-gray-200 rounded w-16 animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-8 bg-gray-200 rounded w-20 animate-pulse"></div>
+                  <div className="h-8 bg-gray-200 rounded w-20 animate-pulse"></div>
+                  <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show centered error state if API call fails
+  if (isError) {
+    const axiosError = error as AxiosError<{ message?: string }>;
+    return (
+      <div className="page-container py-8">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <FiAlertCircle className="h-24 w-24 text-red-500 mx-auto mb-4" />
+            <p className="text-lg font-medium text-gray-900">
+              {axiosError?.response?.data?.message || 'Failed to load addresses'}
+            </p>
           </div>
         </div>
       </div>

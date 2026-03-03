@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useGetProfile } from '../../../tanstack/useUsers';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiClock, FiEdit2, FiLock, FiMap, FiBell } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiMapPin, FiClock, FiEdit2, FiLock, FiMap, FiBell, FiAlertCircle } from 'react-icons/fi';
 import type { AxiosError } from 'axios';
 
 // Main profile display page component
@@ -8,27 +8,53 @@ const Profile = () => {
   const navigate = useNavigate();
   const { data: profile, isLoading, isError, error } = useGetProfile();
 
-  // Show loading spinner while fetching profile data
+  // Show skeleton loader while fetching profile data
   if (isLoading) {
     return (
       <div className="page-container py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+        <div className="">
+          <div className="h-9 bg-gray-200 rounded w-32 mb-6 animate-pulse"></div>
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
+            {/* Avatar skeleton */}
+            <div className="flex items-center justify-center mb-8">
+              <div className="w-24 h-24 rounded-full bg-gray-200 animate-pulse"></div>
+            </div>
+            {/* Info fields skeleton */}
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-20 mb-2 animate-pulse"></div>
+                    <div className="h-6 bg-gray-200 rounded w-40 animate-pulse"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Buttons skeleton */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <div className="h-10 bg-gray-200 rounded flex-1 animate-pulse"></div>
+              <div className="h-10 bg-gray-200 rounded flex-1 animate-pulse"></div>
+            </div>
+            <div className="h-10 bg-gray-200 rounded w-full mt-3 animate-pulse"></div>
+            <div className="h-10 bg-gray-200 rounded w-full mt-3 animate-pulse"></div>
           </div>
         </div>
       </div>
     );
   }
 
-  // Show error message if API call fails
+  // Show centered error state if API call fails
   if (isError) {
     const axiosError = error as AxiosError<{ message?: string }>;
     return (
       <div className="page-container py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="alert alert-error">
-            <p>{axiosError?.response?.data?.message || 'Failed to load profile'}</p>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <FiAlertCircle className="h-24 w-24 text-red-500 mx-auto mb-4" />
+            <p className="text-lg font-medium text-gray-900">
+              {axiosError?.response?.data?.message || 'Failed to load profile'}
+            </p>
           </div>
         </div>
       </div>

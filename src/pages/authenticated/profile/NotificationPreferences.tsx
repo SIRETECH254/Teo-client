@@ -11,7 +11,7 @@ import type { AxiosError } from 'axios';
 // Notification preferences page component
 const NotificationPreferences = () => {
   const navigate = useNavigate();
-  const { data: preferencesData, isLoading } = useGetNotificationPreferences();
+  const { data: preferencesData, isLoading, isError, error } = useGetNotificationPreferences();
   const updatePreferences = useUpdateNotificationPreferences();
 
   const [preferences, setPreferences] = useState({
@@ -88,12 +88,53 @@ const NotificationPreferences = () => {
     }
   };
 
+  // Show skeleton loader while fetching preferences
   if (isLoading) {
     return (
       <div className="page-container py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+        <div className="">
+          <div className="h-9 bg-gray-200 rounded w-64 mb-6 animate-pulse"></div>
+          {/* Preference sections skeleton */}
+          {[1, 2, 3].map((section) => (
+            <div key={section} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
+              <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
+              <div className="space-y-4">
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="flex-1">
+                        <div className="h-5 bg-gray-200 rounded w-40 mb-2 animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded w-64 animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="w-11 h-6 bg-gray-200 rounded-full animate-pulse"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          {/* Buttons skeleton */}
+          <div className="flex gap-3 mt-6">
+            <div className="h-10 bg-gray-200 rounded flex-1 animate-pulse"></div>
+            <div className="h-10 bg-gray-200 rounded flex-1 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show centered error state if API call fails
+  if (isError) {
+    const axiosError = error as AxiosError<{ message?: string }>;
+    return (
+      <div className="page-container py-8">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <FiAlertCircle className="h-24 w-24 text-red-500 mx-auto mb-4" />
+            <p className="text-lg font-medium text-gray-900">
+              {axiosError?.response?.data?.message || 'Failed to load notification preferences'}
+            </p>
           </div>
         </div>
       </div>
