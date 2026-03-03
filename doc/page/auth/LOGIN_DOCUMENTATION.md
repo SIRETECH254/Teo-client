@@ -29,7 +29,7 @@ import logo from '../../../assets/logo.png';
 - **Persistent storage:** `localStorage` stores `accessToken`, `refreshToken`, and serialized `user` data.
 - **Hook usage on login screen:** `const { login, isLoading, error } = useAuth();`
 - **Form state:** `formData` object `{ email: string; password: string }` managed with `useState`.
-- **Additional state:** `showPassword`, `validationErrors`.
+- **Additional state:** `showPassword`.
 
 **`login` function (from `AuthContext.tsx`):**
 ```typescript
@@ -62,7 +62,7 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
 - **Right side:** Login form with email input, password input, and forgot password link.
 - **Typography:** Uses Tailwind utility classes with custom `.auth-title` and `.auth-subtitle` classes for headings.
 - **Branding:** Logo image displayed prominently on the left side.
-- **Feedback:** Error banner shown above submit button, validation errors below inputs.
+- **Feedback:** Error banner shown above submit button.
 
 ## Planned Layout
 ```
@@ -118,14 +118,11 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
         name="email"
         type="email"
         required
-        className={`input pl-10 ${validationErrors.email ? 'border-red-500' : ''}`}
+        className="input pl-10"
         placeholder="Enter your email"
         value={formData.email}
         onChange={handleInputChange}
       />
-      {validationErrors.email && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
-      )}
     </div>
   </div>
   ```
@@ -143,7 +140,7 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
         name="password"
         type={showPassword ? 'text' : 'password'}
         required
-        className={`input-password pl-10 ${validationErrors.password ? 'border-red-500' : ''}`}
+        className="input-password pl-10"
         placeholder="Enter your password"
         value={formData.password}
         onChange={handleInputChange}
@@ -157,9 +154,6 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
           {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
         </button>
       </div>
-      {validationErrors.password && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
-      )}
     </div>
   </div>
   ```
@@ -198,17 +192,11 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
 - Logo image from `assets/logo.png`.
 
 ## Error Handling
-- **Validation errors:** Client-side validation validates form data before submission.
-  - Email must be valid format.
-  - Email is required.
-  - Password is required.
-  - Errors stored in `validationErrors` state object.
-  - Displayed below each input field in red text.
 - **API errors:** Handled in `handleSubmit` function.
   - Error message displayed in red banner above submit button.
   - Error stored in local `error` state from context.
-- **Input change handling:** `handleInputChange` updates form data and clears validation errors.
-- **Form state persistence:** Input values persist in local state after validation failures.
+- **Input change handling:** `handleInputChange` updates form data when user types.
+- **Form state persistence:** Input values persist in local state.
 
 ## Navigation Flow
 - **Route:** `/login`.
@@ -222,27 +210,12 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
 
 ## Functions Involved
 
-- **`handleSubmit`** — Validates form data, calls `login` API, handles navigation on success.
+- **`handleSubmit`** — Calls `login` API, handles navigation on success.
   ```typescript
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationErrors({});
 
     try {
-      // Validate form data
-      if (!formData.email) {
-        setValidationErrors({ email: 'Email is required' });
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        setValidationErrors({ email: 'Please enter a valid email address' });
-        return;
-      }
-      if (!formData.password) {
-        setValidationErrors({ password: 'Password is required' });
-        return;
-      }
-
       const credentials: LoginPayload = {
         email: formData.email,
         password: formData.password,
@@ -252,11 +225,9 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
       
       if (result.success) {
         navigate('/');
-      } else {
-        setValidationErrors({ general: result.error || 'Login failed' });
       }
     } catch (error) {
-      setValidationErrors({ general: 'An unexpected error occurred' });
+      console.error('Login error:', error);
     }
   };
   ```
@@ -269,14 +240,6 @@ const login = async (credentials: LoginPayload): Promise<AuthResult> => {
       ...prev,
       [name]: value
     }));
-    // Clear validation error for this field
-    if (validationErrors[name as keyof typeof validationErrors]) {
-      setValidationErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name as keyof typeof validationErrors];
-        return newErrors;
-      });
-    }
   };
   ```
 

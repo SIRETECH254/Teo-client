@@ -29,7 +29,7 @@ import logo from '../../../assets/logo.png';
 - **Persistent storage:** `localStorage` stores `accessToken`, `refreshToken`, serialized `user` data, and `pendingEmail`.
 - **Hook usage on OTP screen:** `const { verifyOTP, resendOTP, isLoading } = useAuth();`
 - **Form state:** `otp` array `['', '', '', '', '', '']` managed with `useState` (6 digits).
-- **Additional state:** `resendLoading`, `countdown`, `email`, `validationErrors`.
+- **Additional state:** `resendLoading`, `countdown`, `email`.
 
 **`verifyOTP` function (from `AuthContext.tsx`):**
 ```typescript
@@ -144,14 +144,6 @@ const resendOTP = async (emailData: ResendOTPPayload): Promise<AuthResult> => {
   </div>
   ```
 
-- **Validation Error Display**
-  ```typescript
-  {validationErrors.otp && (
-    <div className="auth-inline-message-error mb-4">
-      <p className="text-sm font-medium">{validationErrors.otp}</p>
-    </div>
-  )}
-  ```
 
 - **Submit Button**
   ```typescript
@@ -224,15 +216,8 @@ const resendOTP = async (emailData: ResendOTPPayload): Promise<AuthResult> => {
 - Logo image from `assets/logo.png`.
 
 ## Error Handling
-- **Validation errors:** Client-side validation validates OTP format before submission.
-  - OTP must be exactly 6 digits.
-  - OTP must contain only numbers.
-  - Email must be valid.
-  - Errors stored in `validationErrors` state object.
-  - Displayed in red banner below OTP inputs.
 - **API errors:** Handled in `handleSubmit` function.
   - Error message displayed via error banner.
-  - Error stored in validation errors if validation fails.
 - **Email retrieval:** Email retrieved from `location.state` or `localStorage.getItem('pendingEmail')`.
   - If no email found, user is redirected to `/login`.
 - **Countdown timer:** Prevents spam resend requests with 60-second countdown.
@@ -250,20 +235,13 @@ const resendOTP = async (emailData: ResendOTPPayload): Promise<AuthResult> => {
 
 ## Functions Involved
 
-- **`handleSubmit`** — Validates OTP, calls `verifyOTP` API, handles navigation on success.
+- **`handleSubmit`** — Calls `verifyOTP` API, handles navigation on success.
   ```typescript
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationErrors({});
 
     try {
       const otpString = otp.join('');
-      
-      // Validate OTP
-      if (otpString.length !== 6 || !/^\d+$/.test(otpString)) {
-        setValidationErrors({ otp: 'Please enter a valid 6-digit code' });
-        return;
-      }
 
       const result = await verifyOTP({
         email,
@@ -273,11 +251,9 @@ const resendOTP = async (emailData: ResendOTPPayload): Promise<AuthResult> => {
       if (result.success) {
         localStorage.removeItem('pendingEmail');
         navigate('/');
-      } else {
-        setValidationErrors({ otp: result.error || 'Verification failed' });
       }
     } catch (error) {
-      setValidationErrors({ otp: 'An unexpected error occurred' });
+      console.error('OTP verification error:', error);
     }
   };
   ```
@@ -320,8 +296,6 @@ const resendOTP = async (emailData: ResendOTPPayload): Promise<AuthResult> => {
     
     if (result.success) {
       setCountdown(60); // 60 seconds countdown
-    } else {
-      setValidationErrors({ otp: result.error || 'Failed to resend OTP' });
     }
     
     setResendLoading(false);

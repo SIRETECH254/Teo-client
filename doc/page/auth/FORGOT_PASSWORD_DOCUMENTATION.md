@@ -29,7 +29,7 @@ import logo from '../../../assets/logo.png';
 - **Persistent storage:** `localStorage` stores tokens and user data (not used for forgot password flow).
 - **Hook usage on forgot password screen:** `const { forgotPassword, isLoading } = useAuth();`
 - **Form state:** `email` string managed with `useState`.
-- **Additional state:** `isSubmitted`, `validationErrors`.
+- **Additional state:** `isSubmitted`.
 
 **`forgotPassword` function (from `AuthContext.tsx`):**
 ```typescript
@@ -163,14 +163,11 @@ const forgotPassword = async (email: string): Promise<AuthResult> => {
         name="email"
         type="email"
         required
-        className={`input pl-10 ${validationErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+        className="input pl-10"
         placeholder="Enter your email address"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      {validationErrors.email && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
-      )}
     </div>
   </div>
   ```
@@ -241,15 +238,9 @@ const forgotPassword = async (email: string): Promise<AuthResult> => {
 - Logo image from `assets/logo.png`.
 
 ## Error Handling
-- **Validation errors:** Client-side validation validates email format before submission.
-  - Email must be valid format.
-  - Email is required.
-  - Errors stored in `validationErrors` state object.
-  - Displayed below email input in red text.
 - **API errors:** Handled in `handleSubmit` function.
   - Error message displayed via error banner.
-  - Error stored in validation errors if validation fails.
-- **Form state persistence:** Email value persists in local state after validation failures.
+- **Form state persistence:** Email value persists in local state.
 
 ## Navigation Flow
 - **Route:** `/forgot-password`.
@@ -263,28 +254,19 @@ const forgotPassword = async (email: string): Promise<AuthResult> => {
 
 ## Functions Involved
 
-- **`handleSubmit`** — Validates email, calls `forgotPassword` API, switches to success state on success.
+- **`handleSubmit`** — Calls `forgotPassword` API, switches to success state on success.
   ```typescript
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationErrors({});
 
     try {
-      // Validate email
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setValidationErrors({ email: 'Please enter a valid email address' });
-        return;
-      }
-
       const result = await forgotPassword(email);
 
       if (result.success) {
         setIsSubmitted(true);
-      } else {
-        setValidationErrors({ email: result.error || 'Failed to send reset email' });
       }
     } catch (error) {
-      setValidationErrors({ email: 'An unexpected error occurred' });
+      console.error('Forgot password error:', error);
     }
   };
   ```

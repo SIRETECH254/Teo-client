@@ -29,7 +29,7 @@ import logo from '../../../assets/logo.png';
 - **Persistent storage:** `localStorage` stores tokens and user data (not used during registration, only after OTP verification).
 - **Hook usage on register screen:** `const { register, isLoading, error } = useAuth();`
 - **Form state:** `formData` object `{ name: string; email: string; phone: string; password: string; confirmPassword: string }` managed with `useState`.
-- **Additional state:** `showPassword`, `showConfirmPassword`, `validationErrors`.
+- **Additional state:** `showPassword`, `showConfirmPassword`.
 
 **`register` function (from `AuthContext.tsx`):**
 ```typescript
@@ -55,7 +55,7 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
 - **Right side:** Registration form with name, email, phone, password, and confirm password inputs.
 - **Typography:** Uses Tailwind utility classes with custom `.auth-title` and `.auth-subtitle` classes for headings.
 - **Branding:** Logo image displayed prominently on the left side.
-- **Feedback:** Error banner shown above submit button, validation errors below inputs, password strength indicators.
+- **Feedback:** Error banner shown above submit button, password strength indicators.
 
 ## Planned Layout
 ```
@@ -132,14 +132,11 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
         name="name"
         type="text"
         required
-        className={`input pl-10 ${validationErrors.name ? 'border-red-500' : ''}`}
+        className="input pl-10"
         placeholder="Enter your full name"
         value={formData.name}
         onChange={handleInputChange}
       />
-      {validationErrors.name && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
-      )}
     </div>
   </div>
   ```
@@ -157,14 +154,11 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
         name="email"
         type="email"
         required
-        className={`input pl-10 ${validationErrors.email ? 'border-red-500' : ''}`}
+        className="input pl-10"
         placeholder="Enter your email"
         value={formData.email}
         onChange={handleInputChange}
       />
-      {validationErrors.email && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
-      )}
     </div>
   </div>
   ```
@@ -182,14 +176,11 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
         name="phone"
         type="tel"
         required
-        className={`input pl-10 ${validationErrors.phone ? 'border-red-500' : ''}`}
+        className="input pl-10"
         placeholder="Enter your phone number"
         value={formData.phone}
         onChange={handleInputChange}
       />
-      {validationErrors.phone && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.phone}</p>
-      )}
     </div>
   </div>
   ```
@@ -207,7 +198,7 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
         name="password"
         type={showPassword ? 'text' : 'password'}
         required
-        className={`input-password pl-10 ${validationErrors.password ? 'border-red-500' : ''}`}
+        className="input-password pl-10"
         placeholder="Enter your password"
         value={formData.password}
         onChange={handleInputChange}
@@ -221,9 +212,6 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
           {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
         </button>
       </div>
-      {validationErrors.password && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
-      )}
     </div>
     {/* Password requirements */}
     {formData.password && (
@@ -261,7 +249,7 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
         name="confirmPassword"
         type={showConfirmPassword ? 'text' : 'password'}
         required
-        className={`input-password pl-10 ${validationErrors.confirmPassword ? 'border-red-500' : ''}`}
+        className="input-password pl-10"
         placeholder="Confirm your password"
         value={formData.confirmPassword}
         onChange={handleInputChange}
@@ -275,9 +263,6 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
           {showConfirmPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
         </button>
       </div>
-      {validationErrors.confirmPassword && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.confirmPassword}</p>
-      )}
     </div>
     {/* Password match indicator */}
     {formData.confirmPassword && (
@@ -326,19 +311,11 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
 - Logo image from `assets/logo.png`.
 
 ## Error Handling
-- **Validation errors:** Client-side validation validates form data before submission.
-  - Name is required.
-  - Email must be valid format.
-  - Phone must be valid format.
-  - Password must meet requirements (at least 6 chars, uppercase, lowercase, number).
-  - Confirm password must match password.
-  - Errors stored in `validationErrors` state object.
-  - Displayed below each input field in red text.
 - **API errors:** Handled in `handleSubmit` function.
   - Error message displayed in red banner above submit button.
   - Error stored in local `error` state from context.
-- **Input change handling:** `handleInputChange` updates form data and clears validation errors.
-- **Form state persistence:** Input values persist in local state after validation failures.
+- **Input change handling:** `handleInputChange` updates form data when user types.
+- **Form state persistence:** Input values persist in local state.
 
 ## Navigation Flow
 - **Route:** `/register`.
@@ -351,35 +328,12 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
 
 ## Functions Involved
 
-- **`handleSubmit`** — Validates form data, calls `register` API, handles navigation on success.
+- **`handleSubmit`** — Calls `register` API, handles navigation on success.
   ```typescript
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationErrors({});
 
     try {
-      // Validate form data
-      if (!formData.name.trim()) {
-        setValidationErrors(prev => ({ ...prev, name: 'Name is required' }));
-        return;
-      }
-      if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        setValidationErrors(prev => ({ ...prev, email: 'Valid email is required' }));
-        return;
-      }
-      if (!formData.phone || !/^\+?[\d\s-()]+$/.test(formData.phone)) {
-        setValidationErrors(prev => ({ ...prev, phone: 'Valid phone number is required' }));
-        return;
-      }
-      if (!formData.password || formData.password.length < 6 || !/[A-Z]/.test(formData.password) || !/[a-z]/.test(formData.password) || !/\d/.test(formData.password)) {
-        setValidationErrors(prev => ({ ...prev, password: 'Password must meet all requirements' }));
-        return;
-      }
-      if (formData.password !== formData.confirmPassword) {
-        setValidationErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }));
-        return;
-      }
-
       const userData: RegisterPayload = {
         name: formData.name,
         email: formData.email,
@@ -392,11 +346,9 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
       
       if (result.success) {
         navigate('/otp-verification', { state: { email: formData.email } });
-      } else {
-        setValidationErrors({ general: result.error || 'Registration failed' });
       }
     } catch (error) {
-      setValidationErrors({ general: 'An unexpected error occurred' });
+      console.error('Registration error:', error);
     }
   };
   ```
@@ -409,14 +361,6 @@ const register = async (userData: RegisterPayload): Promise<AuthResult> => {
       ...prev,
       [name]: value
     }));
-    // Clear validation error for this field
-    if (validationErrors[name as keyof typeof validationErrors]) {
-      setValidationErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name as keyof typeof validationErrors];
-        return newErrors;
-      });
-    }
   };
   ```
 

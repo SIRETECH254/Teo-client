@@ -12,6 +12,11 @@ import ResetPassword from './pages/public/auth/ResetPassword';
 import Product from './pages/public/Product';
 import Contact from './pages/public/Contact';
 import Cart from './pages/authenticated/Cart';
+import Profile from './pages/authenticated/profile/Profile';
+import EditProfile from './pages/authenticated/profile/EditProfile';
+import ChangePassword from './pages/authenticated/profile/ChangePassword';
+import Addresses from './pages/authenticated/profile/Addresses';
+import NotificationPreferences from './pages/authenticated/profile/NotificationPreferences';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,6 +44,11 @@ function App() {
           <Route path="/product" element={<Product />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/edit" element={<EditProfile />} />
+          <Route path="/profile/change-password" element={<ChangePassword />} />
+          <Route path="/profile/addresses" element={<Addresses />} />
+          <Route path="/profile/notifications" element={<NotificationPreferences />} />
         </Routes>
       </main>
       <Footer />

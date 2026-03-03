@@ -29,7 +29,7 @@ import logo from '../../../assets/logo.png';
 - **Persistent storage:** `localStorage` stores tokens and user data (not used for reset password flow).
 - **Hook usage on reset password screen:** `const { resetPassword, isLoading } = useAuth();`
 - **Form state:** `formData` object `{ newPassword: string; confirmPassword: string }` managed with `useState`.
-- **Additional state:** `showPassword`, `showConfirmPassword`, `isSuccess`, `validationErrors`.
+- **Additional state:** `showPassword`, `showConfirmPassword`, `isSuccess`.
 - **URL params:** `token` extracted from URL using `useParams()` hook.
 
 **`resetPassword` function (from `AuthContext.tsx`):**
@@ -176,7 +176,7 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
         name="newPassword"
         type={showPassword ? 'text' : 'password'}
         required
-        className={`input-password pl-10 ${validationErrors.newPassword ? 'border-red-500' : ''}`}
+        className="input-password pl-10"
         placeholder="Enter new password"
         value={formData.newPassword}
         onChange={handleInputChange}
@@ -190,9 +190,6 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
           {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
         </button>
       </div>
-      {validationErrors.newPassword && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.newPassword}</p>
-      )}
     </div>
     {/* Password requirements */}
     {formData.newPassword && (
@@ -230,7 +227,7 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
         name="confirmPassword"
         type={showConfirmPassword ? 'text' : 'password'}
         required
-        className={`input-password pl-10 ${validationErrors.confirmPassword ? 'border-red-500' : ''}`}
+        className="input-password pl-10"
         placeholder="Confirm new password"
         value={formData.confirmPassword}
         onChange={handleInputChange}
@@ -244,9 +241,6 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
           {showConfirmPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
         </button>
       </div>
-      {validationErrors.confirmPassword && (
-        <p className="mt-1 text-sm text-red-600">{validationErrors.confirmPassword}</p>
-      )}
     </div>
     {/* Password match indicator */}
     {formData.confirmPassword && (
@@ -316,18 +310,11 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
 - Logo image from `assets/logo.png`.
 
 ## Error Handling
-- **Validation errors:** Client-side validation validates password format and match before submission.
-  - Password must be at least 6 characters.
-  - Password must contain at least one uppercase letter, one lowercase letter, and one number.
-  - Confirm password must match new password.
-  - Errors stored in `validationErrors` state object.
-  - Displayed below respective input fields in red text.
 - **API errors:** Handled in `handleSubmit` function.
   - Error message displayed via error banner.
-  - Error stored in validation errors if validation fails.
 - **Real-time validation:** Password requirements shown with visual indicators (green/red) as user types.
 - **Password match indicator:** Shows green checkmark when passwords match, red X when they don't.
-- **Form state persistence:** Input values persist in local state after validation failures.
+- **Form state persistence:** Input values persist in local state.
 
 ## Navigation Flow
 - **Route:** `/reset-password/:token`.
@@ -341,25 +328,14 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
 
 ## Functions Involved
 
-- **`handleSubmit`** — Validates passwords, calls `resetPassword` API, switches to success state on success.
+- **`handleSubmit`** — Calls `resetPassword` API, switches to success state on success.
   ```typescript
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationErrors({});
 
     try {
-      // Validate form data
-      if (!formData.newPassword || formData.newPassword.length < 6 || !/[A-Z]/.test(formData.newPassword) || !/[a-z]/.test(formData.newPassword) || !/\d/.test(formData.newPassword)) {
-        setValidationErrors({ newPassword: 'Password must meet all requirements' });
-        return;
-      }
-      if (formData.newPassword !== formData.confirmPassword) {
-        setValidationErrors({ confirmPassword: 'Passwords do not match' });
-        return;
-      }
-
       if (!token) {
-        setValidationErrors({ general: 'Invalid reset token' });
+        console.error('Invalid reset token');
         return;
       }
 
@@ -367,11 +343,9 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
 
       if (result.success) {
         setIsSuccess(true);
-      } else {
-        setValidationErrors({ general: result.error || 'Failed to reset password' });
       }
     } catch (error) {
-      setValidationErrors({ general: 'An unexpected error occurred' });
+      console.error('Reset password error:', error);
     }
   };
   ```
@@ -384,14 +358,6 @@ const resetPassword = async (token: string, newPassword: string): Promise<AuthRe
       ...prev,
       [name]: value
     }));
-    // Clear validation error for this field
-    if (validationErrors[name as keyof typeof validationErrors]) {
-      setValidationErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name as keyof typeof validationErrors];
-        return newErrors;
-      });
-    }
   };
   ```
 
