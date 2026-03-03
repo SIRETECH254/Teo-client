@@ -4,7 +4,11 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Sidebar from './components/layout/Sidebar';
 import Home from './pages/public/Home';
-import Login from './pages/public/Login';
+import Login from './pages/public/auth/Login';
+import Register from './pages/public/auth/Register';
+import OTPVerification from './pages/public/auth/OTPVerification';
+import ForgotPassword from './pages/public/auth/ForgotPassword';
+import ResetPassword from './pages/public/auth/ResetPassword';
 import Product from './pages/public/Product';
 import Contact from './pages/public/Contact';
 import Cart from './pages/authenticated/Cart';
@@ -28,6 +32,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/product" element={<Product />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />

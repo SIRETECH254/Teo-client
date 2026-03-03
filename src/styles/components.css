@@ -89,11 +89,11 @@
 
   /* Auth layout helpers */
   .auth-page {
-    @apply min-h-screen w-full bg-white text-slate-900;
+    @apply w-full bg-white text-slate-900;
   }
 
   .auth-container {
-    @apply mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-center px-6 py-12;
+    @apply mx-auto flex  w-full max-w-5xl flex-col items-center justify-center px-6 py-12;
   }
 
   .auth-header {
