@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { FiLock, FiEye, FiEyeOff, FiCheck } from 'react-icons/fi';
 import logo from '../../../assets/logo.png';
 
 const ResetPassword = () => {
   const { resetPassword, isLoading } = useAuth();
-  const navigate = useNavigate();
   const { token } = useParams<{ token: string }>();
   const [formData, setFormData] = useState({
     newPassword: '',
