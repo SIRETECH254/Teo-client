@@ -198,19 +198,19 @@ export const cartAPI = {
   getCart: () => api.get('/api/cart'),
 
   // Add item to cart.
-  addToCart: (cartData: AddToCartPayload) => api.post('/api/cart', cartData),
+  addToCart: (cartData: AddToCartPayload) => api.post('/api/cart/add', cartData),
 
   // Update cart item quantity.
-  updateCartItem: (skuId: string, updateData: UpdateCartItemPayload) => api.patch(`/api/cart/${skuId}`, updateData),
+  updateCartItem: (skuId: string, updateData: UpdateCartItemPayload) => api.put(`/api/cart/items/${skuId}`, updateData),
 
   // Remove item from cart.
-  removeFromCart: (skuId: string) => api.delete(`/api/cart/${skuId}`),
+  removeFromCart: (skuId: string) => api.delete(`/api/cart/items/${skuId}`),
 
   // Clear all items from cart.
-  clearCart: () => api.delete('/api/cart'),
+  clearCart: () => api.delete('/api/cart/clear'),
 
   // Validate cart items (check stock, prices).
-  validateCart: () => api.post('/api/cart/validate'),
+  validateCart: () => api.get('/api/cart/validate'),
 };
 
 // ============================================

@@ -9,7 +9,8 @@ import Register from './pages/public/auth/Register';
 import OTPVerification from './pages/public/auth/OTPVerification';
 import ForgotPassword from './pages/public/auth/ForgotPassword';
 import ResetPassword from './pages/public/auth/ResetPassword';
-import Product from './pages/public/Product';
+import Products from './pages/public/Products';
+import ProductDetail from './pages/public/ProductDetail';
 import Contact from './pages/public/Contact';
 import Cart from './pages/authenticated/Cart';
 import Profile from './pages/authenticated/profile/Profile';
@@ -41,7 +42,8 @@ function App() {
           <Route path="/otp-verification" element={<OTPVerification />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/product" element={<Product />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />

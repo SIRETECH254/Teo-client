@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { cartAPI } from '../api';
 import type { AddToCartPayload, UpdateCartItemPayload } from '../types/api.types';
+import toast from 'react-hot-toast';
 
 const DEFAULT_STALE_TIME = 1000 * 60 * 5; // 5 minutes
 const DEFAULT_GC_TIME = 1000 * 60 * 10; // 10 minutes
@@ -29,12 +30,11 @@ export const useAddToCart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
-      console.log('Item added to cart successfully');
+      toast.success('Item added to cart successfully');
     },
     onError: (error: any) => {
-      console.error('Add to cart error:', error);
       const errorMessage = error.response?.data?.message || 'Failed to add item to cart';
-      console.error('Error:', errorMessage);
+      toast.error(errorMessage);
     },
   });
 };
@@ -50,12 +50,11 @@ export const useUpdateCartItem = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
-      console.log('Cart item updated successfully');
+      toast.success('Cart item updated successfully');
     },
     onError: (error: any) => {
-      console.error('Update cart item error:', error);
       const errorMessage = error.response?.data?.message || 'Failed to update cart item';
-      console.error('Error:', errorMessage);
+      toast.error(errorMessage);
     },
   });
 };
@@ -71,12 +70,11 @@ export const useRemoveFromCart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
-      console.log('Item removed from cart successfully');
+      toast.success('Item removed from cart successfully');
     },
     onError: (error: any) => {
-      console.error('Remove from cart error:', error);
       const errorMessage = error.response?.data?.message || 'Failed to remove item from cart';
-      console.error('Error:', errorMessage);
+      toast.error(errorMessage);
     },
   });
 };
@@ -92,12 +90,11 @@ export const useClearCart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
-      console.log('Cart cleared successfully');
+      toast.success('Cart cleared successfully');
     },
     onError: (error: any) => {
-      console.error('Clear cart error:', error);
       const errorMessage = error.response?.data?.message || 'Failed to clear cart';
-      console.error('Error:', errorMessage);
+      toast.error(errorMessage);
     },
   });
 };
@@ -109,10 +106,12 @@ export const useValidateCart = () => {
       const response = await cartAPI.validateCart();
       return response.data.data;
     },
+    onSuccess: () => {
+      toast.success('Cart validated successfully');
+    },
     onError: (error: any) => {
-      console.error('Validate cart error:', error);
       const errorMessage = error.response?.data?.message || 'Failed to validate cart';
-      console.error('Error:', errorMessage);
+      toast.error(errorMessage);
     },
   });
 };

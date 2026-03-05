@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { HiMenu } from 'react-icons/hi';
 import { FaShoppingCart } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
+import { useGetCart } from '../../tanstack/useCart';
 import logo from '../../assets/logo.png';
 
 interface NavbarProps {
@@ -14,6 +15,14 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
   const { isAuthenticated, user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Get cart data for badge
+  const { data: cartData } = useGetCart();
+  const cartItemCount = useMemo(() => {
+    if (!isAuthenticated) return 0;
+    const cart = cartData?.data || cartData;
+    return cart?.totalItems || cart?.items?.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) || 0;
+  }, [cartData, isAuthenticated]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -39,6 +48,9 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
   };
 
   const isActive = (path: string) => {
+    if (path === '/products') {
+      return location.pathname === '/products' || location.pathname.startsWith('/products/');
+    }
     return location.pathname === path;
   };
 
@@ -86,14 +98,14 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
               Home
             </Link>
             <Link
-              to="/product"
+              to="/products"
               className={`px-3 py-2 rounded-lg font-semibold transition-colors ${
-                isActive('/product')
+                isActive('/products')
                   ? 'text-brand-primary bg-brand-tint'
                   : 'text-gray-700 hover:text-brand-primary hover:bg-gray-50'
               }`}
             >
-              Product
+              Products
             </Link>
             <Link
               to="/contact"
@@ -118,6 +130,11 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
                   aria-label="Shopping cart"
                 >
                   <FaShoppingCart className="w-6 h-6 text-gray-700" />
+                  {cartItemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartItemCount > 99 ? '99+' : cartItemCount}
+                    </span>
+                  )}
                 </Link>
                 {/* Avatar with Dropdown */}
                 <div className="relative" ref={dropdownRef}>

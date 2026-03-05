@@ -11,12 +11,15 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
 
   const isActive = (path: string) => {
+    if (path === '/products') {
+      return location.pathname === '/products' || location.pathname.startsWith('/products/');
+    }
     return location.pathname === path;
   };
 
   const navLinks = [
     { path: '/', label: 'Home', icon: FaHome },
-    { path: '/product', label: 'Product', icon: FaBox },
+    { path: '/products', label: 'Products', icon: FaBox },
     { path: '/contact', label: 'Contact', icon: FaEnvelope },
   ];
 
