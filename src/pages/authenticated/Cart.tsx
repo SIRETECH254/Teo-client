@@ -152,7 +152,7 @@ const Cart = () => {
     try {
       const result = await validateCoupon.mutateAsync({
         code: couponCode.toUpperCase(),
-        orderAmount: calculateSubtotal,
+        subtotal: calculateSubtotal,
       });
 
       if (result.success) {
@@ -211,7 +211,7 @@ const Cart = () => {
       try {
         const res = await validateCoupon.mutateAsync({
           code: appliedCoupon.code,
-          orderAmount: calculateSubtotal,
+          subtotal: calculateSubtotal,
         });
 
         if (res?.success) {
