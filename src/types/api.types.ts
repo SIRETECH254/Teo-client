@@ -211,9 +211,10 @@ export interface GetOrdersParams {
 // ============================================
 export interface PayInvoicePayload {
   invoiceId: string;
-  paymentMethod: 'mpesa_stk' | 'paystack_card';
-  phoneNumber?: string; // Required for M-Pesa
-  email?: string; // Required for Paystack
+  method: 'mpesa_stk' | 'paystack_card';
+  amount: number;
+  payerPhone?: string; // Required for M-Pesa
+  payerEmail?: string; // Required for Paystack
 }
 
 // ============================================

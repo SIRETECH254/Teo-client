@@ -308,6 +308,9 @@ export const couponAPI = {
 // Packaging API
 // ============================================
 export const packagingAPI = {
+  // Get packaging options with optional filtering.
+  getPackaging: (params = {}) => api.get('/api/packaging', { params }),
+
   // Get active packaging options.
   getActivePackaging: () => api.get('/api/packaging/active'),
 

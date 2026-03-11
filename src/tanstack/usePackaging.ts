@@ -4,6 +4,19 @@ import { packagingAPI } from '../api';
 const DEFAULT_STALE_TIME = 1000 * 60 * 5; // 5 minutes
 const DEFAULT_GC_TIME = 1000 * 60 * 10; // 10 minutes
 
+// Get packaging options with optional filtering
+export const useGetPackaging = (params = {}) => {
+  return useQuery({
+    queryKey: ['packaging', params],
+    queryFn: async () => {
+      const response = await packagingAPI.getPackaging(params);
+      return response.data;
+    },
+    staleTime: DEFAULT_STALE_TIME,
+    gcTime: DEFAULT_GC_TIME,
+  });
+};
+
 // Get active packaging options
 export const useGetActivePackaging = () => {
   return useQuery({
