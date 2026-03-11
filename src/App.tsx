@@ -18,6 +18,7 @@ import EditProfile from './pages/authenticated/profile/EditProfile';
 import ChangePassword from './pages/authenticated/profile/ChangePassword';
 import Addresses from './pages/authenticated/profile/Addresses';
 import NotificationPreferences from './pages/authenticated/profile/NotificationPreferences';
+import Checkout from './pages/authenticated/Checkout';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -46,6 +47,7 @@ function App() {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/profile/change-password" element={<ChangePassword />} />
