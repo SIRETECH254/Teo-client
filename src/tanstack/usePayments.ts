@@ -37,19 +37,7 @@ export const useGetPaymentById = (paymentId: string) => {
   });
 };
 
-// Query the status of an M-Pesa STK Push payment
-export const useQueryMpesaStatus = (checkoutRequestId: string) => {
-  return useQuery({
-    queryKey: ['payment', 'mpesa-status', checkoutRequestId],
-    queryFn: async () => {
-      const response = await paymentAPI.queryMpesaStatus(checkoutRequestId);
-      return response.data.data;
-    },
-    enabled: !!checkoutRequestId,
-    staleTime: DEFAULT_STALE_TIME,
-    gcTime: DEFAULT_GC_TIME,
-  });
-};
+
 
 // Query M-Pesa payment by checkout request ID
 export const useQueryMpesaByCheckoutId = (checkoutRequestId: string) => {

@@ -19,7 +19,7 @@ const CartSuccessModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center w-full">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 transition-opacity"
@@ -27,7 +27,7 @@ const CartSuccessModal = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-t-lg shadow-xl w-full max-w-sm mx-4 mb-4 transform transition-all">
+      <div className="relative bg-white rounded-t-lg shadow-xl w-full  mx-4 mb-4 transform transition-all">
         {/* Top separator line */}
         <div className="h-1 bg-gray-200 rounded-t-lg" />
 
