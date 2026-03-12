@@ -33,6 +33,7 @@ import type {
   // Order types
   CreateOrderPayload,
   GetOrdersParams,
+  GetMyOrdersParams,
   // Payment types
   PayInvoicePayload,
   // Address types
@@ -223,6 +224,9 @@ export const orderAPI = {
   // Get all orders with optional filtering and pagination.
   getOrders: (params?: GetOrdersParams) => api.get('/api/orders', { params }),
 
+  // Get current user's orders with optional filtering and pagination.
+  getMyOrders: (params?: GetMyOrdersParams) => api.get('/api/orders/my-orders', { params }),
+
   // Get single order details by ID.
   getOrderById: (orderId: string) => api.get(`/api/orders/${orderId}`),
 };
@@ -237,11 +241,8 @@ export const paymentAPI = {
   // Get single payment details by ID.
   getPaymentById: (paymentId: string) => api.get(`/api/payments/${paymentId}`),
 
-  // Query the status of an M-Pesa STK Push payment.
-  queryMpesaStatus: (checkoutRequestId: string) => api.get(`/api/payments/status/${checkoutRequestId}`),
-
   // Query M-Pesa payment by checkout request ID.
-  queryMpesaByCheckoutId: (checkoutRequestId: string) => api.get(`/api/payments/mpesa/${checkoutRequestId}`),
+  queryMpesaByCheckoutId: (checkoutRequestId: string) => api.get(`api/payments/mpesa-status/${checkoutRequestId}`),
 };
 
 // ============================================

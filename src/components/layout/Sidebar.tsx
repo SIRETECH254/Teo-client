@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { HiX } from 'react-icons/hi';
 import { FaHome, FaBox, FaEnvelope } from 'react-icons/fa';
+import { FiShoppingBag, FiUser } from 'react-icons/fi';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,6 +11,7 @@ interface SidebarProps {
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   const isActive = (path: string) => {
     if (path === '/products') {
@@ -21,6 +24,11 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { path: '/', label: 'Home', icon: FaHome },
     { path: '/products', label: 'Products', icon: FaBox },
     { path: '/contact', label: 'Contact', icon: FaEnvelope },
+  ];
+
+  const authLinks = [
+    { path: '/orders', label: 'My Orders', icon: FiShoppingBag },
+    { path: '/profile', label: 'Profile', icon: FiUser },
   ];
 
   return (
@@ -54,7 +62,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 p-4">
+          <nav className="flex-1 p-4 overflow-y-auto">
             <ul className="space-y-2">
               {navLinks.map(({ path, label, icon: Icon }) => (
                 <li key={path}>
@@ -72,6 +80,30 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                   </Link>
                 </li>
               ))}
+
+              {isAuthenticated && (
+                <>
+                  <div className="pt-4 pb-2 px-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Account</p>
+                  </div>
+                  {authLinks.map(({ path, label, icon: Icon }) => (
+                    <li key={path}>
+                      <Link
+                        to={path}
+                        onClick={onClose}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg font-semibold transition-colors ${
+                          isActive(path)
+                            ? 'text-brand-primary bg-brand-tint'
+                            : 'text-gray-700 hover:text-brand-primary hover:bg-gray-50'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span>{label}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </>
+              )}
             </ul>
           </nav>
         </div>

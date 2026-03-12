@@ -1223,6 +1223,48 @@ The system uses a unified user model with roles:
   }
   ```
 
+#### Get My Orders
+- **Endpoint:** `GET /orders/my-orders`
+- **Description:** Retrieve a paginated list of orders belonging to the authenticated user.
+- **Auth Required:** Yes
+- **Query Parameters:**
+  - `page`, `limit`, `status`, `paymentStatus`, `type`, `location`, `q` (search by invoice number).
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "orders": [
+        {
+          "_id": "65e26b1c09b068c201383820",
+          "createdAt": "2026-02-15T10:30:00.000Z",
+          "status": "PLACED",
+          "paymentStatus": "UNPAID",
+          "pricing": {
+            "subtotal": 1500,
+            "discounts": 0,
+            "packagingFee": 50,
+            "schedulingFee": 0,
+            "deliveryFee": 0,
+            "tax": 0,
+            "total": 1550
+          },
+          "invoice": {
+            "_id": "65e26b1c09b068c201383821",
+            "number": "INV-2026-123456"
+          }
+        }
+      ],
+      "pagination": {
+        "currentPage": 1,
+        "pageSize": 10,
+        "totalItems": 1,
+        "totalPages": 1
+      }
+    }
+  }
+  ```
+
 #### Get Order by ID
 - **Endpoint:** `GET /orders/:id`
 - **Description:** Get single order details

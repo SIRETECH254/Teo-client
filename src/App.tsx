@@ -19,6 +19,9 @@ import ChangePassword from './pages/authenticated/profile/ChangePassword';
 import Addresses from './pages/authenticated/profile/Addresses';
 import NotificationPreferences from './pages/authenticated/profile/NotificationPreferences';
 import Checkout from './pages/authenticated/Checkout';
+import PaymentStatus from './pages/authenticated/PaymentStatus';
+import Orders from './pages/authenticated/order/Orders';
+import OrderDetail from './pages/authenticated/order/OrderDetail';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -32,10 +35,10 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen w-full">
       <Navbar onMenuClick={handleMenuClick} />
       <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
-      <main className="flex-1">
+      <main className="flex-1 w-full">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -48,6 +51,9 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment-status" element={<PaymentStatus />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:orderId" element={<OrderDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/profile/change-password" element={<ChangePassword />} />

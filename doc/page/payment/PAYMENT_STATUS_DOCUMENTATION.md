@@ -21,8 +21,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { FiCheckCircle, FiXCircle, FiLoader, FiArrowLeft, FiPackage, FiUser, FiCreditCard } from 'react-icons/fi';
-import { useGetPaymentById, useQueryMpesaByCheckoutId, usePayInvoice } from '../hooks/usePayments';
-import { useGetOrderById } from '../hooks/useOrders';
+import { useGetPaymentById, useQueryMpesaByCheckoutId, usePayInvoice } from '../../tanstack/usePayments';
+import { useGetOrderById } from '../../tanstack/useOrders';
 ```
 
 ## Context and State Management

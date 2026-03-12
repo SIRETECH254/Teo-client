@@ -177,6 +177,56 @@ export interface UpdateCartItemPayload {
 // ============================================
 // Order Types
 // ============================================
+export interface IOrderItem {
+  productId: {
+    _id: string;
+    title: string;
+    primaryImage?: string;
+    images?: Array<{ url: string; isPrimary: boolean }>;
+  };
+  title: string;
+  quantity: number;
+  unitPrice: number;
+  variantOptions?: Record<string, string>;
+  totalPrice: number;
+}
+
+export interface IOrderPricing {
+  subtotal: number;
+  discounts: number;
+  packagingFee: number;
+  schedulingFee: number;
+  deliveryFee: number;
+  tax: number;
+  total: number;
+}
+
+export interface IInvoice {
+  _id: string;
+  number: string;
+  status: 'UNPAID' | 'PAID' | 'PARTIALLY_PAID' | 'VOIDED';
+  amount: number;
+  dueDate: string;
+}
+
+export interface IOrder {
+  _id: string;
+  orderNumber: string;
+  customerId: string | IUser;
+  items: IOrderItem[];
+  status: 'PLACED' | 'CONFIRMED' | 'PACKED' | 'SHIPPED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  paymentStatus: 'UNPAID' | 'PENDING' | 'PAID' | 'PARTIALLY_REFUNDED' | 'REFUNDED';
+  pricing: IOrderPricing;
+  type: 'pickup' | 'delivery';
+  location: 'in_shop' | 'away';
+  invoice?: {
+    _id: string;
+    number: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CreateOrderPayload {
   customerId?: string; // Optional, defaults to authenticated user
   location: 'in_shop' | 'away';
@@ -206,13 +256,26 @@ export interface GetOrdersParams {
   q?: string; // Search by invoice number
 }
 
+export interface GetMyOrdersParams extends GetOrdersParams {}
+
 // ============================================
 // Payment Types
 // ============================================
+export interface IPayment {
+  _id: string;
+  invoiceId: string;
+  amount: number;
+  method: 'mpesa_stk' | 'paystack_card';
+  status: 'PENDING' | 'SUCCESS' | 'FAILED' | 'CANCELLED';
+  transactionId?: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface PayInvoicePayload {
   invoiceId: string;
   method: 'mpesa_stk' | 'paystack_card';
-  amount: number;
   payerPhone?: string; // Required for M-Pesa
   payerEmail?: string; // Required for Paystack
 }

@@ -166,6 +166,14 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
                       >
                         Profile
                       </Link>
+                      {/* My Orders Link */}
+                      <Link
+                        to="/orders"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        My Orders
+                      </Link>
                       {/* Logout Button */}
                       <button
                         onClick={handleLogout}

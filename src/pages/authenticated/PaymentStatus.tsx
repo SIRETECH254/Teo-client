@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
-import { FiCheckCircle, FiXCircle, FiLoader, FiArrowLeft, FiPackage, FiUser, FiCreditCard } from 'react-icons/fi';
-import { useGetPaymentById, useQueryMpesaByCheckoutId, usePayInvoice } from '../hooks/usePayments';
-import { useGetOrderById } from '../hooks/useOrders';
+import { FiCheckCircle, FiXCircle, FiLoader, FiPackage, FiCreditCard } from 'react-icons/fi';
+import { useGetPaymentById, useQueryMpesaByCheckoutId, usePayInvoice } from '../../tanstack/usePayments';
+import { useGetOrderById } from '../../tanstack/useOrders';
 
 const FALLBACK_TIMEOUT = 60000; // 60 seconds
 
@@ -22,21 +22,21 @@ const PaymentStatus = () => {
   const payerEmail = searchParams.get('payerEmail');
 
   // TanStack Queries
-  const { data: paymentData, isLoading: isLoadingPayment, refetch: refetchPayment } = useGetPaymentById(paymentId);
-  const { data: orderData, isLoading: isLoadingOrder } = useGetOrderById(orderId);
-  const { refetch: refetchMpesaStatus } = useQueryMpesaByCheckoutId(checkoutId, { enabled: false });
+  const { data: paymentData, refetch: refetchPayment } = useGetPaymentById(paymentId || '');
+  const { data: orderData } = useGetOrderById(orderId || '');
+  const { refetch: refetchMpesaStatus } = useQueryMpesaByCheckoutId(checkoutId || '', { enabled: false });
   const payInvoice = usePayInvoice();
 
   // Local State
-  const [socketStatus, setSocketStatus] = useState(null);
+  const [socketStatus, setSocketStatus] = useState<string | null>(null);
   const [socketConnected, setSocketConnected] = useState(false);
   const [isFallbackActive, setIsFallbackActive] = useState(false);
-  const [socketError, setSocketError] = useState(null);
+  const [socketError, setSocketError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
 
   // Refs
-  const socketRef = useRef(null);
-  const timeoutRef = useRef(null);
+  const socketRef = useRef<Socket | null>(null);
+  const timeoutRef = useRef<any>(null);
 
   // Derived Status
   const currentStatus = useMemo(() => {
@@ -63,12 +63,12 @@ const PaymentStatus = () => {
   /**
    * Maps Daraja result codes to UI states
    */
-  const handleMpesaResultCode = useCallback((resultCode, resultMessage) => {
+  const handleMpesaResultCode = useCallback((resultCode: any, resultMessage: string) => {
     clearPaymentTimers();
     
     // Explicitly convert to number and handle null/undefined/string/number
    // Ensure we handle string codes from API (e.g., "0")
-   const code = resultCode === 'string' ? parseInt(resultCode, 10) : resultCode;
+   const code = typeof resultCode === 'string' ? parseInt(resultCode, 10) : resultCode;
 
     switch (code) {
       case 0:
@@ -141,7 +141,7 @@ const PaymentStatus = () => {
   /**
    * Initializes websocket connection and event listeners
    */
-  const startTracking = useCallback((trackingPaymentId, trackingMethod) => {
+  const startTracking = useCallback((trackingPaymentId: string, trackingMethod: string) => {
     clearPaymentTimers();
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
@@ -160,13 +160,12 @@ const PaymentStatus = () => {
       socketRef.current?.emit('subscribe-to-payment', trackingPaymentId);
     });
 
-    socketRef.current.on('callback.received', (payload) => {
+    socketRef.current.on('callback.received', (payload: any) => {
       console.log('callback.received', payload);
       handleMpesaResultCode(payload.code, payload.message);
-
     });
 
-    socketRef.current.on('payment.updated', (payload) => {
+    socketRef.current.on('payment.updated', (payload: any) => {
       if (String(payload.paymentId) === String(trackingPaymentId)) {
         setSocketStatus(payload.status);
         if (payload.status === 'SUCCESS' || payload.status === 'FAILED' || payload.status === 'PAID') {
@@ -181,7 +180,7 @@ const PaymentStatus = () => {
         setIsFallbackActive(true);
         try {
           const result = await refetchMpesaStatus();
-          const fallbackData = result?.data;
+          const fallbackData = result?.data as any;
           
           if (fallbackData) {
             // Priority: payload.resultCode -> payload.raw.ResultCode -> fallback to existing logic
@@ -190,13 +189,16 @@ const PaymentStatus = () => {
             
             handleMpesaResultCode(code, message);
             
+            if (fallbackData.status === 'SUCCESS' || fallbackData.status === 'FAILED' || fallbackData.status === 'PAID') {
+              refetchPayment();
+            }
           }
         } catch (err) {
           console.error('Fallback query failed:', err);
         }
       }, FALLBACK_TIMEOUT);
     }
-  }, [clearPaymentTimers, handleMpesaResultCode, checkoutId, refetchMpesaStatus]);
+  }, [clearPaymentTimers, handleMpesaResultCode, checkoutId, refetchMpesaStatus, refetchPayment]);
 
   // Initial setup
   useEffect(() => {
@@ -213,8 +215,8 @@ const PaymentStatus = () => {
       const res = await payInvoice.mutateAsync({
         invoiceId,
         method: method === 'MPESA' ? 'mpesa_stk' : 'paystack_card',
-        payerPhone,
-        payerEmail
+        payerPhone: payerPhone || undefined,
+        payerEmail: payerEmail || undefined
       });
 
       if (res?.success) {
@@ -274,8 +276,8 @@ const PaymentStatus = () => {
   const statusDisplay = getStatusDisplay();
 
   return (
-    <div className="min-h-screen bg-light  p-4 flex items-center justify-center w-full">
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-xl py-8 px-4 text-center border border-gray-100 w-full">
+    <div className="min-h-screen bg-light  p-4  w-full">
+      <div className=" bg-white rounded-xl shadow-xl py-8 px-4 text-center border border-gray-100 w-full">
         
         {/* Status Section */}
         <div className="flex flex-col items-center mb-8">
@@ -285,7 +287,7 @@ const PaymentStatus = () => {
           <h1 className={`title2 ${statusDisplay.color}`}>
             {statusDisplay.title}
           </h1>
-          <p className="text-gray-500 max-w-sm mx-auto mt-2">
+          <p className="text-gray-500 mt-2">
             {statusDisplay.message}
           </p>
         </div>
@@ -299,8 +301,8 @@ const PaymentStatus = () => {
                 <FiPackage className="text-primary" /> Items Purchased
               </h3>
               <div className="space-y-4 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
-                {(orderData.items || []).map((it, idx) => {
-                  const productImage = it?.productId?.primaryImage || it?.productId?.images?.find(img => img?.isPrimary)?.url || it?.productId?.images?.[0]?.url;
+                {(orderData.items || []).map((it: any, idx: number) => {
+                  const productImage = it?.productId?.primaryImage || it?.productId?.images?.find((img: any) => img?.isPrimary)?.url || it?.productId?.images?.[0]?.url;
                   const variantEntries = (() => {
                     if (!it?.variantOptions) return [];
                     return Object.entries(it.variantOptions || {});

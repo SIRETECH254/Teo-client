@@ -40,7 +40,7 @@ export const useGetPaymentById = (paymentId: string) => {
 
 
 // Query M-Pesa payment by checkout request ID
-export const useQueryMpesaByCheckoutId = (checkoutRequestId: string) => {
+export const useQueryMpesaByCheckoutId = (checkoutRequestId: string, options: any = {}) => {
   return useQuery({
     queryKey: ['payment', 'mpesa', checkoutRequestId],
     queryFn: async () => {
@@ -50,5 +50,6 @@ export const useQueryMpesaByCheckoutId = (checkoutRequestId: string) => {
     enabled: !!checkoutRequestId,
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_GC_TIME,
+    ...options,
   });
 };
