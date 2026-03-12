@@ -121,8 +121,8 @@ const OTPVerification = () => {
             <form onSubmit={handleSubmit} className="auth-form">
               {/* OTP input fields */}
               <div className="auth-field">
-                <label className="label">Enter the 6-digit code</label>
-                <div className="flex justify-between gap-2">
+                <label className="label text-center">Enter the 6-digit code</label>
+                <div className="flex justify-center gap-3">
                   {otp.map((digit, index) => (
                     <input
                       key={index}
