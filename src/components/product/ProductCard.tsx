@@ -50,7 +50,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       className="group relative bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 flex flex-col"
     >
       {/* Product Image */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+      <div className="relative aspect-square bg-gray-100 overflow-hidden h-48 md:h-56">
         {productImage ? (
           <img
             src={productImage}

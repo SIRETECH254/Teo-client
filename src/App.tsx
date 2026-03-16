@@ -22,6 +22,7 @@ import Checkout from './pages/authenticated/Checkout';
 import PaymentStatus from './pages/authenticated/PaymentStatus';
 import Orders from './pages/authenticated/order/Orders';
 import OrderDetail from './pages/authenticated/order/OrderDetail';
+import WhatsAppButton from './components/ui/WhatsAppButton';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -62,6 +63,7 @@ function App() {
         </Routes>
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }
