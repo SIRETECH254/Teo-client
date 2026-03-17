@@ -104,7 +104,10 @@ export interface GetProductsParams {
   search?: string;
   category?: string;
   collection?: string;
+  brand?: string;
+  tag?: string;
   status?: 'active' | 'draft' | 'archived';
+  sort?: string;
 }
 
 export interface GetOptimizedImagesParams {
