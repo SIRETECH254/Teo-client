@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import HeroImage from "../../assets/Hero.jpeg";
 import { useGetAllProducts } from "../../tanstack/useProducts";
 import ProductCard from "../../components/product/ProductCard";
 import ProductCardSkeleton from "../../components/product/ProductCardSkeleton";
-import {Link} from "react-router-dom"
-import { FaArrowRight } from "react-icons/fa";
 
 const Home = () => {
   const [windowSize, setWindowSize] = useState({
