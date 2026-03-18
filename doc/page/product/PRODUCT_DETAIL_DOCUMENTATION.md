@@ -23,7 +23,6 @@ import { useGetProductById } from '../../tanstack/useProducts';
 import { useAddToCart } from '../../tanstack/useCart';
 import VariantSelector from '../../components/product/VariantSelector';
 import CartSuccessModal from '../../components/cart/CartSuccessModal';
-import ReviewsSection from '../../components/product/ReviewsSection';
 import toast from 'react-hot-toast';
 ```
 
@@ -47,7 +46,6 @@ import toast from 'react-hot-toast';
 - **Add to cart button:** Validates selection and stock before adding
 - **Description section:** HTML description display
 - **Features section:** Bulleted list of product features
-- **Reviews section:** Product reviews with ratings and comments
 
 ## Planned Layout
 ```
@@ -71,9 +69,6 @@ import toast from 'react-hot-toast';
 │  └─────────────────────────────────────────────────────────┘ │
 │  ┌─────────────────────────────────────────────────────────┐ │
 │  │  Features                                                │ │
-│  └─────────────────────────────────────────────────────────┘ │
-│  ┌─────────────────────────────────────────────────────────┐ │
-│  │  Reviews Section                                        │ │
 │  └─────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -203,12 +198,6 @@ The API returns fully populated data with brand, categories, collections, and ta
   - `itemName` - Product name to display
 - **Features:** Success animation, action buttons
 
-### ReviewsSection
-- **Props:**
-  - `productId` - Product ID for fetching reviews
-  - `className` - Optional CSS classes
-- **Features:** Review display, rating stats, pagination
-
 ## Error Handling
 
 ### Loading States
@@ -236,7 +225,6 @@ The API returns fully populated data with brand, categories, collections, and ta
    - Adjust quantity
    - Add to cart
    - View description and features
-   - Read reviews
 4. After adding to cart:
    - Toast notification appears: "{product.title} added to cart"
    - Success modal appears

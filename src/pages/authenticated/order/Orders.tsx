@@ -3,18 +3,23 @@ import { FiSearch, FiPackage, FiFilter } from 'react-icons/fi';
 import { useGetMyOrders } from '../../../tanstack/useOrders';
 import OrdersCard from '../../../components/order/OrdersCard';
 import OrdersCardSkeleton from '../../../components/order/OrdersCardSkeleton';
+import Pagination from '../../../components/ui/Pagination';
 import type { IOrder } from '../../../types/api.types';
 
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [page, setPage] = useState(1);
 
   const { data, isLoading, isError } = useGetMyOrders({
     q: searchTerm || undefined,
     status: (statusFilter as any) || undefined,
+    page,
+    limit: 10,
   });
 
   const orders = data?.orders || [];
+  const pagination = data?.pagination;
 
   return (
     <div className="page-container py-8 min-h-screen">
@@ -34,7 +39,10 @@ const Orders = () => {
                 type="text"
                 placeholder="Search by invoice..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none transition-all text-sm"
               />
             </div>
@@ -42,7 +50,10 @@ const Orders = () => {
             <div className="relative group">
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setPage(1);
+                }}
                 className="appearance-none pl-10 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none transition-all text-sm font-semibold text-gray-700 cursor-pointer"
               >
                 <option value="">All Status</option>
@@ -94,6 +105,20 @@ const Orders = () => {
             {orders.map((order: IOrder) => (
               <OrdersCard key={order._id} order={order} />
             ))}
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="pt-8">
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.totalPages}
+                  onPageChange={(p) => setPage(p)}
+                  totalItems={pagination.totalDocs}
+                  pageSize={10}
+                  currentPageCount={orders.length}
+                />
+              </div>
+            )}
           </div>
         )}
 

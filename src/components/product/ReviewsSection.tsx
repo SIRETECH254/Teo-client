@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGetProductReviews } from '../../tanstack/useReviews';
 import { useAuth } from '../../contexts/AuthContext';
 import { FiMessageSquare, FiStar } from 'react-icons/fi';
+import Pagination from '../../components/ui/Pagination';
 
 // Reviews section component for displaying product reviews
 interface ReviewsSectionProps {
@@ -171,27 +172,14 @@ const ReviewsSection = ({ productId, className = '' }: ReviewsSectionProps) => {
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-            className="btn-secondary btn-sm"
-          >
-            Previous
-          </button>
-          <span className="text-sm text-gray-600">
-            Page {pagination.currentPage} of {pagination.totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(pagination.totalPages, prev + 1))
-            }
-            disabled={currentPage === pagination.totalPages}
-            className="btn-secondary btn-sm"
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={(p) => setCurrentPage(p)}
+          totalItems={pagination.totalDocs}
+          pageSize={5} // As set in the useGetProductReviews call
+          currentPageCount={reviews.length}
+        />
       )}
     </div>
   );

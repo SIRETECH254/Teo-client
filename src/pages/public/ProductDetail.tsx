@@ -17,7 +17,6 @@ import {
 } from 'react-icons/fi';
 import VariantSelector from '../../components/product/VariantSelector';
 import CartSuccessModal from '../../components/cart/CartSuccessModal';
-import ReviewsSection from '../../components/product/ReviewsSection';
 import toast from 'react-hot-toast';
 
 // Product detail page component
@@ -549,11 +548,6 @@ const ProductDetail = () => {
           onGoToCart={handleGoToCart}
           itemName={product?.title || 'Product'}
         />
-
-        {/* Reviews Section */}
-        <div className="mt-12">
-          <ReviewsSection productId={id || ''} />
-        </div>
       </div>
     </>
   );

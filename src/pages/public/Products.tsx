@@ -6,6 +6,7 @@ import { useGetAllBrands } from '../../tanstack/useBrands';
 import { useGetAllTags } from '../../tanstack/useTags';
 import ProductCard from '../../components/product/ProductCard';
 import ProductCardSkeleton from '../../components/product/ProductCardSkeleton';
+import Pagination from '../../components/ui/Pagination';
 import { FiPackage, FiSearch, FiFilter, FiX, FiTag, FiFolder, FiGrid, FiBarChart2, FiAward } from 'react-icons/fi';
 
 // Products list page component with search and filtering
@@ -275,24 +276,15 @@ const Products = () => {
 
               {/* Pagination */}
               {pagination && pagination.totalPages > 1 && (
-                <div className="mt-12 flex justify-center gap-2">
-                  <button
-                    disabled={!pagination.hasPrevPage}
-                    onClick={() => setPage(p => p - 1)}
-                    className="btn-secondary btn-sm disabled:opacity-50"
-                  >
-                    Previous
-                  </button>
-                  <div className="flex items-center px-4 text-sm font-medium text-gray-700">
-                    Page {pagination.page} of {pagination.totalPages}
-                  </div>
-                  <button
-                    disabled={!pagination.hasNextPage}
-                    onClick={() => setPage(p => p + 1)}
-                    className="btn-secondary btn-sm disabled:opacity-50"
-                  >
-                    Next
-                  </button>
+                <div className="mt-12">
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    onPageChange={(p) => setPage(p)}
+                    totalItems={pagination.totalDocs}
+                    pageSize={20} // As set in the useGetAllProducts call
+                    currentPageCount={products.length}
+                  />
                 </div>
               )}
             </>
