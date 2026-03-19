@@ -371,9 +371,40 @@ export interface GetNotificationsParams {
 export interface SubmitContactPayload {
   name: string;
   email: string;
-  phone: string;
   subject: string;
   message: string;
+}
+
+export interface ContactMessage {
+  _id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  userId?: string | { _id: string; name: string; email: string };
+  status: 'New' | 'Read' | 'Replied';
+  replies: any[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetMyMessagesParams extends PaginationParams {}
+
+export interface GetMyMessagesResponse {
+  success: boolean;
+  message: string;
+  data: ContactMessage[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalDocs: number;
+    totalPages: number;
+  };
+}
+
+export interface GetContactMessageResponse {
+  success: boolean;
+  data: ContactMessage;
 }
 
 // ============================================

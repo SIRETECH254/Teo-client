@@ -49,6 +49,7 @@ import type {
   GetNotificationsParams,
   // Contact types
   SubmitContactPayload,
+  GetMyMessagesParams,
 } from '../types/api.types';
 
 // ============================================
@@ -351,6 +352,12 @@ export const notificationAPI = {
 export const contactAPI = {
   // Submit contact form message.
   submitMessage: (messageData: SubmitContactPayload) => api.post('/api/contact', messageData),
+
+  // Get all contact messages submitted by the authenticated user.
+  getMyMessages: (params?: GetMyMessagesParams) => api.get('/api/contact/my-messages', { params }),
+
+  // Get a single contact message by its ID.
+  getMessageById: (id: string) => api.get(`/api/contact/${id}`),
 };
 
 // Export the api instance for custom requests

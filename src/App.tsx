@@ -22,6 +22,8 @@ import Checkout from './pages/authenticated/Checkout';
 import PaymentStatus from './pages/authenticated/PaymentStatus';
 import Orders from './pages/authenticated/order/Orders';
 import OrderDetail from './pages/authenticated/order/OrderDetail';
+import MyContacts from './pages/authenticated/contact/MyContacts';
+import ContactDetail from './pages/authenticated/contact/ContactDetail';
 import WhatsAppButton from './components/ui/WhatsAppButton';
 
 function App() {
@@ -55,6 +57,8 @@ function App() {
           <Route path="/payment-status" element={<PaymentStatus />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:orderId" element={<OrderDetail />} />
+          <Route path="/my-contacts" element={<MyContacts />} />
+          <Route path="/my-contacts/:id" element={<ContactDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/profile/change-password" element={<ChangePassword />} />

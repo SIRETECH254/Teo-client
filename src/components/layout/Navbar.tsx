@@ -174,6 +174,14 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
                       >
                         My Orders
                       </Link>
+                      {/* My Messages Link */}
+                      <Link
+                        to="/my-contacts"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        My Messages
+                      </Link>
                       {/* Logout Button */}
                       <button
                         onClick={handleLogout}

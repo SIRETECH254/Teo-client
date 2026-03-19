@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { HiX } from 'react-icons/hi';
-import { FaHome, FaBox, FaEnvelope } from 'react-icons/fa';
+import { FaHome, FaBox, FaEnvelope, FaEnvelopeOpenText } from 'react-icons/fa';
 import { FiShoppingBag, FiUser } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -28,6 +28,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   const authLinks = [
     { path: '/orders', label: 'My Orders', icon: FiShoppingBag },
+    { path: '/my-contacts', label: 'My Messages', icon: FaEnvelopeOpenText },
     { path: '/profile', label: 'Profile', icon: FiUser },
   ];
 

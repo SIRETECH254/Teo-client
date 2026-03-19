@@ -1,6 +1,6 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { contactAPI } from '../api';
-import type { SubmitContactPayload } from '../types/api.types';
+import type { SubmitContactPayload, GetMyMessagesParams } from '../types/api.types';
 
 // Submit contact form message
 export const useSubmitContact = () => {
@@ -17,5 +17,31 @@ export const useSubmitContact = () => {
       const errorMessage = error.response?.data?.message || 'Failed to submit contact message';
       console.error('Error:', errorMessage);
     },
+  });
+};
+
+// Get all contact messages submitted by the authenticated user
+export const useMyMessages = (params?: GetMyMessagesParams) => {
+  return useQuery({
+    queryKey: ['my-messages', params],
+    queryFn: async () => {
+      const response = await contactAPI.getMyMessages(params);
+      return {
+        messages: response.data.data,
+        pagination: response.data.pagination
+      };
+    },
+  });
+};
+
+// Get single contact message by its ID
+export const useContactMessage = (id: string) => {
+  return useQuery({
+    queryKey: ['contact-message', id],
+    queryFn: async () => {
+      const response = await contactAPI.getMessageById(id);
+      return response.data.data;
+    },
+    enabled: !!id,
   });
 };
