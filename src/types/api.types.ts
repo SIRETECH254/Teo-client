@@ -222,9 +222,14 @@ export interface IOrder {
   pricing: IOrderPricing;
   type: 'pickup' | 'delivery';
   location: 'in_shop' | 'away';
+  addressId?: any;
   invoice?: {
     _id: string;
     number: string;
+  };
+  paymentPreference?: {
+    mode: 'post_to_bill' | 'pay_now' | 'cash' | 'cod';
+    method?: 'mpesa_stk' | 'paystack_card';
   };
   createdAt: string;
   updatedAt: string;
@@ -279,6 +284,7 @@ export interface IPayment {
 export interface PayInvoicePayload {
   invoiceId: string;
   method: 'mpesa_stk' | 'paystack_card';
+  amount?: number;
   payerPhone?: string; // Required for M-Pesa
   payerEmail?: string; // Required for Paystack
 }

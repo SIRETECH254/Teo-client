@@ -1,10 +1,17 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiPackage, FiCreditCard, FiMapPin, FiTruck, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiPackage, FiCreditCard, FiMapPin, FiTruck, FiClock, FiAlertCircle, FiLoader } from 'react-icons/fi';
 import { useGetOrderById } from '../../../tanstack/useOrders';
+import { usePayInvoice } from '../../../tanstack/usePayments';
+import { useAuth } from '../../../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 const OrderDetail = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const payInvoice = usePayInvoice();
+  const [isPaying, setIsPaying] = useState(false);
   const { data: order, isLoading, isError } = useGetOrderById(orderId || '');
 
   const formatDate = (dateString: string) => {
@@ -16,6 +23,8 @@ const OrderDetail = () => {
       minute: '2-digit',
     });
   };
+
+  console.log(order);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -31,6 +40,79 @@ const OrderDetail = () => {
         return 'bg-amber-100 text-amber-700';
       default:
         return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const handlePayment = async () => {
+
+    if (!order?.invoiceId?._id) {
+      toast.error('Invoice not found for this order');
+      return;
+    }
+
+    try {
+      setIsPaying(true);
+      
+      // Determine payment method: prefer order's preference, default to mpesa_stk
+      const method = order.paymentPreference?.method || 'mpesa_stk';
+      
+      const payload: any = {
+        invoiceId: order.invoiceId._id,
+        method,
+        amount: order.pricing?.total,
+      };
+
+      if (method === 'mpesa_stk') {
+        const phone = user?.phone;
+        if (!phone) {
+          toast.error('Phone number is required for M-Pesa payment. Please update your profile.');
+          setIsPaying(false);
+          return;
+        }
+        payload.payerPhone = phone;
+      } else if (method === 'paystack_card') {
+        const email = user?.email;
+        if (!email) {
+          toast.error('Email is required for Paystack payment. Please update your profile.');
+          setIsPaying(false);
+          return;
+        }
+        payload.payerEmail = email;
+      }
+
+      const res = (await payInvoice.mutateAsync(payload)) as any;
+      
+      if (res) {
+        const paymentId = res?.paymentId;
+        const checkoutRequestId = res?.daraja?.checkoutRequestId;
+        const reference = res?.reference;
+
+        const params = new URLSearchParams({
+          method: method === 'mpesa_stk' ? 'mpesa' : 'paystack',
+          paymentId: paymentId || '',
+          orderId: order._id || '',
+          provider: method === 'mpesa_stk' ? 'mpesa' : 'paystack',
+          invoiceId: order?.invoiceId?._id || '',
+        });
+
+        if (method === 'mpesa_stk') {
+          if (checkoutRequestId) params.append('checkoutRequestId', checkoutRequestId);
+          if (user?.phone) params.append('payerPhone', user.phone);
+          toast.success('STK push sent. Complete on your phone.');
+        } else {
+          if (reference) params.append('reference', reference);
+          if (user?.email) params.append('payerEmail', user.email);
+          const url = res?.authorizationUrl;
+          if (url) window.open(url, '_blank');
+        }
+
+        navigate(`/payment-status?${params.toString()}`);
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error(error?.response?.data?.message || 'Failed to initiate payment');
+    } finally {
+      setIsPaying(false);
     }
   };
 
@@ -292,10 +374,18 @@ const OrderDetail = () => {
 
             {order.paymentStatus !== 'PAID' && order.status !== 'CANCELLED' && (
               <button 
-                onClick={() => navigate(`/payment-status?orderId=${order._id}&invoiceId=${order.invoice?._id}`)}
-                className="w-full btn-primary py-4 text-sm font-black uppercase tracking-widest"
+                onClick={handlePayment}
+                disabled={isPaying || payInvoice.isPending}
+                className="w-full btn-primary py-4 text-sm font-black uppercase tracking-widest flex items-center justify-center gap-2"
               >
-                Complete Payment
+                {isPaying || payInvoice.isPending ? (
+                  <>
+                    <FiLoader className="animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Complete Payment'
+                )}
               </button>
             )}
           </div>

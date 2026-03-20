@@ -143,6 +143,11 @@ const PaymentStatus = () => {
    */
   const startTracking = useCallback((trackingPaymentId: string, trackingMethod: string) => {
     clearPaymentTimers();
+    
+    // Reset local status states for the new tracking session
+    setSocketStatus(null);
+    setSocketError(null);
+    setIsFallbackActive(false);
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -210,35 +215,39 @@ const PaymentStatus = () => {
 
   const handleRetry = async () => {
     if (!invoiceId) return;
+    
+    // Reset states immediately to show loading/pending state
     setIsRetrying(true);
+    setSocketStatus('PENDING');
+    setSocketError(null);
+    setIsFallbackActive(false);
+
     try {
-      const res = await payInvoice.mutateAsync({
+      const res = (await payInvoice.mutateAsync({
         invoiceId,
         method: method === 'MPESA' ? 'mpesa_stk' : 'paystack_card',
         payerPhone: payerPhone || undefined,
         payerEmail: payerEmail || undefined
-      });
+      })) as any;
 
-      if (res?.success) {
-        const newPaymentId = res.data?.paymentId;
-        const newCheckoutId = res.data?.daraja?.checkoutRequestId;
+      // TanStack hook returns response.data.data directly
+      if (res) {
+        const newPaymentId = res.paymentId;
+        const newCheckoutId = res.daraja?.checkoutRequestId;
         
-        // Update URL and state
+        // Update URL - This will trigger the useEffect to restart tracking
         const params = new URLSearchParams(searchParams);
         if (newPaymentId) params.set('paymentId', newPaymentId);
         if (newCheckoutId) params.set('checkoutRequestId', newCheckoutId);
         navigate(`/payment-status?${params.toString()}`, { replace: true });
         
-        setSocketStatus('PENDING');
-        setSocketError(null);
-        setIsFallbackActive(false);
-        
-        if (newPaymentId) {
-          startTracking(newPaymentId, method);
-        }
+        toast.success('Retry initiated. Please check your phone.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Retry failed:', err);
+      toast.error(err?.response?.data?.message || 'Failed to initiate payment');
+      setSocketStatus('FAILED');
+      setSocketError('Failed to restart payment. Please try again.');
     } finally {
       setIsRetrying(false);
     }
