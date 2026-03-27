@@ -13,6 +13,8 @@ const OrdersCard = ({ order }: OrdersCardProps) => {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -26,17 +28,26 @@ const OrdersCard = ({ order }: OrdersCardProps) => {
           </div>
           
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="mb-2">
               <h3 className="font-bold text-gray-900">Order #{order.orderNumber || order._id.slice(-8).toUpperCase()}</h3>
-              <StatusBadge status={order.status} type="order-status" />
             </div>
             
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <FiCalendar className="w-3.5 h-3.5" />
+            <div className="flex flex-col gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase text-gray-400 min-w-[50px]">Order:</span>
+                <StatusBadge status={order.status} type="order-status" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase text-gray-400 min-w-[50px]">Payment:</span>
+                <StatusBadge status={order.paymentStatus} type="payment-status" />
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
+              <div className="flex items-center gap-1.5 text-xs">
+                <FiCalendar className="w-3.5 h-3.5 text-brand-primary" />
                 <span>{formatDate(order.createdAt)}</span>
               </div>
-
             </div>
           </div>
         </div>
