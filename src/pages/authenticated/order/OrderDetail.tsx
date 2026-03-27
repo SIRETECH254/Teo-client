@@ -5,6 +5,7 @@ import { useGetOrderById } from '../../../tanstack/useOrders';
 import { usePayInvoice } from '../../../tanstack/usePayments';
 import { useAuth } from '../../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import StatusBadge from '../../../components/ui/StatusBadge';
 
 const OrderDetail = () => {
   const { orderId } = useParams<{ orderId: string }>();
@@ -25,23 +26,6 @@ const OrderDetail = () => {
   };
 
   console.log(order);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'DELIVERED':
-        return 'bg-green-100 text-green-700';
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-700';
-      case 'SHIPPED':
-      case 'OUT_FOR_DELIVERY':
-        return 'bg-blue-100 text-blue-700';
-      case 'PLACED':
-      case 'CONFIRMED':
-        return 'bg-amber-100 text-amber-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
 
   const handlePayment = async () => {
 
@@ -241,12 +225,13 @@ const OrderDetail = () => {
           </div>
           
           <div className="flex flex-col items-end gap-2 w-full md:w-auto">
-            <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(order.status)}`}>
-              {order.status}
-            </span>
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">
-              Payment Status: <span className="text-brand-primary">{order.paymentStatus}</span>
-            </p>
+            <StatusBadge status={order.status} type="order-status" className="font-black tracking-widest px-4 py-1.5" />
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">
+                Payment Status:
+              </p>
+              <StatusBadge status={order.paymentStatus} type="payment-status" />
+            </div>
           </div>
         </div>
       </div>

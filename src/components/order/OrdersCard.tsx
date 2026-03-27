@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FiPackage, FiChevronRight, FiCalendar } from 'react-icons/fi';
 import type { IOrder } from '../../types/api.types';
+import StatusBadge from '../ui/StatusBadge';
 
 interface OrdersCardProps {
   order: IOrder;
@@ -15,23 +16,6 @@ const OrdersCard = ({ order }: OrdersCardProps) => {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'DELIVERED':
-        return 'bg-green-100 text-green-700';
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-700';
-      case 'SHIPPED':
-      case 'OUT_FOR_DELIVERY':
-        return 'bg-blue-100 text-blue-700';
-      case 'PLACED':
-      case 'CONFIRMED':
-        return 'bg-amber-100 text-amber-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5 mb-4 group">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -44,9 +28,7 @@ const OrdersCard = ({ order }: OrdersCardProps) => {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-bold text-gray-900">Order #{order.orderNumber || order._id.slice(-8).toUpperCase()}</h3>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${getStatusColor(order.status)}`}>
-                {order.status}
-              </span>
+              <StatusBadge status={order.status} type="order-status" />
             </div>
             
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
