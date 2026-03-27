@@ -23,7 +23,7 @@ const PaymentStatus = () => {
 
   // TanStack Queries
   const { data: paymentData, refetch: refetchPayment } = useGetPaymentById(paymentId || '');
-  const { data: orderData } = useGetOrderById(orderId || '');
+  const { data: orderData, refetch: refetchOrder } = useGetOrderById(orderId || '');
   const { refetch: refetchMpesaStatus } = useQueryMpesaByCheckoutId(checkoutId || '', { enabled: false });
   const payInvoice = usePayInvoice();
 
@@ -74,6 +74,9 @@ const PaymentStatus = () => {
       case 0:
         setSocketStatus('SUCCESS');
         toast.success('Payment received successfully!');
+        // Refresh underlying data
+        refetchPayment();
+        refetchOrder();
         break;
       
       case 1032:
@@ -167,14 +170,22 @@ const PaymentStatus = () => {
 
     socketRef.current.on('callback.received', (payload: any) => {
       console.log('callback.received', payload);
-      handleMpesaResultCode(payload.code, payload.message);
+      // Support both lowercase and uppercase keys from Daraja callback
+      const code = payload.code ?? payload.CODE ?? payload.ResultCode;
+      const message = payload.message ?? payload.MESSAGE ?? payload.ResultDesc;
+      handleMpesaResultCode(code, message);
     });
 
     socketRef.current.on('payment.updated', (payload: any) => {
       if (String(payload.paymentId) === String(trackingPaymentId)) {
-        setSocketStatus(payload.status);
-        if (payload.status === 'SUCCESS' || payload.status === 'FAILED' || payload.status === 'PAID') {
-          clearPaymentTimers();
+        const status = (payload.status || payload.STATUS || '').toUpperCase();
+        if (status) {
+          setSocketStatus(status);
+          if (status === 'SUCCESS' || status === 'FAILED' || status === 'PAID' || status === 'CANCELLED') {
+            clearPaymentTimers();
+            refetchPayment();
+            refetchOrder();
+          }
         }
       }
     });
@@ -189,8 +200,8 @@ const PaymentStatus = () => {
           
           if (fallbackData) {
             // Priority: payload.resultCode -> payload.raw.ResultCode -> fallback to existing logic
-            const code = fallbackData.resultCode ?? fallbackData.raw?.ResultCode;
-            const message = fallbackData.resultDesc ?? fallbackData.raw?.ResultDesc;
+            const code = fallbackData.resultCode ?? fallbackData.raw?.ResultCode ?? fallbackData.CODE;
+            const message = fallbackData.resultDesc ?? fallbackData.raw?.ResultDesc ?? fallbackData.message ?? fallbackData.MESSAGE;
             
             handleMpesaResultCode(code, message);
             
