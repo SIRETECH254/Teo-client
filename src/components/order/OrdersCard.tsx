@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiPackage, FiChevronRight, FiCalendar, FiClock } from 'react-icons/fi';
+import { FiPackage, FiChevronRight, FiCalendar } from 'react-icons/fi';
 import type { IOrder } from '../../types/api.types';
 
 interface OrdersCardProps {
@@ -54,10 +54,7 @@ const OrdersCard = ({ order }: OrdersCardProps) => {
                 <FiCalendar className="w-3.5 h-3.5" />
                 <span>{formatDate(order.createdAt)}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <FiClock className="w-3.5 h-3.5" />
-                <span>{order.items?.length || 0} {order.items?.length === 1 ? 'Item' : 'Items'}</span>
-              </div>
+
             </div>
           </div>
         </div>
