@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { UseQueryOptions } from '@tanstack/react-query';
 import { productAPI } from '../api';
 import type { GetProductsParams, GetOptimizedImagesParams } from '../types/api.types';
 
@@ -7,7 +8,10 @@ const DEFAULT_GC_TIME = 1000 * 60 * 10; // 10 minutes
 
 // Get all products with optional filtering and pagination
 // Response: { success: true, data: products.docs, pagination: {...} }
-export const useGetAllProducts = (params?: GetProductsParams) => {
+export const useGetAllProducts = (
+  params?: GetProductsParams,
+  options?: Omit<UseQueryOptions<any, Error, any>, 'queryKey' | 'queryFn'>
+) => {
   return useQuery({
     queryKey: ['products', params],
     queryFn: async () => {
@@ -20,6 +24,7 @@ export const useGetAllProducts = (params?: GetProductsParams) => {
     },
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_GC_TIME,
+    ...options,
   });
 };
 

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useGetAllProducts } from '../../tanstack/useProducts';
 import { useGetAllCategories } from '../../tanstack/useCategories';
 import { useGetAllCollections } from '../../tanstack/useCollections';
@@ -11,14 +12,30 @@ import { FiPackage, FiSearch, FiFilter, FiX, FiTag, FiFolder, FiGrid, FiBarChart
 
 // Products list page component with search and filtering
 const Products = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   // Filter state
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
-  const [collection, setCollection] = useState('');
-  const [brand, setBrand] = useState('');
-  const [tag, setTag] = useState('');
-  const [sort, setSort] = useState('newest');
-  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [collection, setCollection] = useState(searchParams.get('collection') || '');
+  const [brand, setBrand] = useState(searchParams.get('brand') || '');
+  const [tag, setTag] = useState(searchParams.get('tag') || '');
+  const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+
+  // Update URL when filters change
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (search) params.search = search;
+    if (category) params.category = category;
+    if (collection) params.collection = collection;
+    if (brand) params.brand = brand;
+    if (tag) params.tag = tag;
+    if (sort !== 'newest') params.sort = sort;
+    if (page > 1) params.page = page.toString();
+    
+    setSearchParams(params, { replace: true });
+  }, [search, category, collection, brand, tag, sort, page, setSearchParams]);
 
   // Fetch products
   const { data, isLoading, isError, error } = useGetAllProducts({
