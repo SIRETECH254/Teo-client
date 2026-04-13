@@ -47,7 +47,7 @@ const Products = () => {
     sort: sort || undefined,
     status: 'active', // Default to active for public view
     page,
-    limit: 20,
+    limit: 10,
   });
 
   // Fetch filter options
@@ -108,13 +108,6 @@ const Products = () => {
           <div className="flex flex-col gap-y-4">
               
               <div className="flex flex-col  items-start gap-4">
-
-                {/* count */}
-                <div className="">
-                    <p className="text-sm text-gray-600">
-                    {pagination ? `Showing ${products.length} of ${pagination.totalDocs || 0} products` : 'Browse our collection'}
-                    </p>
-                </div>
 
                 {/* filters */}
                 <div className="flex flex-wrap gap-2">
@@ -293,13 +286,13 @@ const Products = () => {
 
               {/* Pagination */}
               {pagination && pagination.totalPages > 1 && (
-                <div className="mt-12">
+                <div className="pt-8">
                   <Pagination
                     currentPage={pagination.page}
                     totalPages={pagination.totalPages}
                     onPageChange={(p) => setPage(p)}
                     totalItems={pagination.totalDocs}
-                    pageSize={20} // As set in the useGetAllProducts call
+                    pageSize={10} // As set in the useGetAllProducts call
                     currentPageCount={products.length}
                   />
                 </div>
