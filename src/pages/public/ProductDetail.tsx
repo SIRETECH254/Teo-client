@@ -370,14 +370,15 @@ const ProductDetail = () => {
                     <span className="text-2xl font-bold text-gray-900">
                       KSh{' '}
                       {(
+                        product.comparePrice ||
                         selectedSKU?.price ||
                         product.basePrice ||
                         0
                       ).toLocaleString()}
                     </span>
-                    {product.comparePrice && (
+                    {product.basePrice && product.basePrice !== (product.comparePrice || selectedSKU?.price || product.basePrice) && (
                       <span className="text-lg text-gray-500 line-through">
-                        KSh {product.comparePrice.toLocaleString()}
+                        KSh {product.basePrice.toLocaleString()}
                       </span>
                     )}
                   </div>

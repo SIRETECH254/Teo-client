@@ -24,12 +24,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
     return null;
   };
 
-  // Get product price - use first SKU price if available, otherwise base price
+  // Get product price - use comparePrice as the main price, fallback to SKU price or base price
   const getProductPrice = () => {
-    if (product.skus && product.skus.length > 0 && product.skus[0]?.price) {
-      return product.skus[0].price;
-    }
-    return product.basePrice || 0;
+    return product.comparePrice || (product.skus && product.skus.length > 0 && product.skus[0]?.price) || product.basePrice || 0;
   };
 
   // Check if product has stock
@@ -104,9 +101,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <span className="text-lg font-bold text-gray-900">
             KSh {productPrice.toLocaleString()}
           </span>
-          {product.comparePrice && product.comparePrice > productPrice && (
+          {product.basePrice && product.basePrice !== productPrice && (
             <span className="text-sm text-gray-500 line-through">
-              KSh {product.comparePrice.toLocaleString()}
+              KSh {product.basePrice.toLocaleString()}
             </span>
           )}
         </div>
