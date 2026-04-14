@@ -7,7 +7,7 @@ export const useValidateCoupon = () => {
   return useMutation({
     mutationFn: async (couponData: ValidateCouponPayload) => {
       const response = await couponAPI.validateCoupon(couponData);
-      return response.data.data;
+      return response.data;
     },
     onError: (error: any) => {
       console.error('Validate coupon error:', error);
@@ -22,7 +22,7 @@ export const useApplyCoupon = () => {
   return useMutation({
     mutationFn: async (couponData: ValidateCouponPayload) => {
       const response = await couponAPI.applyCoupon(couponData);
-      return response.data.data;
+      return response.data;
     },
     onError: (error: any) => {
       console.error('Apply coupon error:', error);

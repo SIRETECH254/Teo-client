@@ -300,7 +300,8 @@ export const reviewAPI = {
 // ============================================
 export const couponAPI = {
   // Validate a coupon code.
-  validateCoupon: (couponData: ValidateCouponPayload) => api.post('/api/coupons/validate', couponData),
+  validateCoupon: (couponData: ValidateCouponPayload) => 
+    api.post('/api/coupons/validate', { code: couponData.code }, { params: { orderAmount: couponData.orderAmount } }),
 
   // Apply a coupon to an order (typically used during order creation).
   applyCoupon: (couponData: ValidateCouponPayload) => api.post('/api/coupons/apply', couponData),

@@ -359,7 +359,7 @@ export interface GetReviewsParams {
 // ============================================
 export interface ValidateCouponPayload {
   code: string;
-  subtotal: number;
+  orderAmount: number;
 }
 
 // ============================================

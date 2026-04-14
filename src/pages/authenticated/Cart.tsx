@@ -6,7 +6,7 @@ import {
   useRemoveFromCart,
   useClearCart,
 } from '../../tanstack/useCart';
-import { useValidateCoupon } from '../../tanstack/useCoupons';
+import { useValidateCoupon, useApplyCoupon } from '../../tanstack/useCoupons';
 import {
   FiShoppingCart,
   FiTrash2,
@@ -27,6 +27,7 @@ const Cart = () => {
   const removeFromCart = useRemoveFromCart();
   const clearCart = useClearCart();
   const validateCoupon = useValidateCoupon();
+  const applyCoupon = useApplyCoupon();
 
   // Coupon and modal state
   const [couponCode, setCouponCode] = useState('');
@@ -140,47 +141,59 @@ const Cart = () => {
     setShowClearModal(false);
   }, []);
 
-  // Handle apply coupon
+  // Coupon handlers
   const handleApplyCoupon = useCallback(async () => {
-    if (!couponCode.trim()) {
-      toast.error('Please enter a coupon code');
-      return;
-    }
-
-    setIsApplyingCoupon(true);
-
-    try {
-      const result = await validateCoupon.mutateAsync({
-        code: couponCode.toUpperCase(),
-        subtotal: calculateSubtotal,
-      });
-
-      if (result.success) {
-        const applied = {
-          code: result.coupon.code,
-          discountAmount: result.discountAmount,
-          name: result.coupon.name,
-          discountType: result.coupon.discountType,
-          discountValue: result.coupon.discountValue,
-        };
-        setAppliedCoupon(applied);
-        try {
-          localStorage.setItem('appliedCoupon', JSON.stringify(applied));
-        } catch (e) {
-          console.error('Storage error:', e);
+        if (!couponCode.trim()) {
+            toast.error('Please enter a coupon code')
+            return
         }
-        toast.success(`Coupon "${result.coupon.name}" applied successfully!`);
-        setCouponCode('');
-      } else {
-        toast.error(result.message || 'Invalid coupon code');
-      }
-    } catch (err: any) {
-      console.error('Error applying coupon:', err);
-      toast.error(err?.response?.data?.message || 'Failed to apply coupon. Please try again.');
-    } finally {
-      setIsApplyingCoupon(false);
-    }
-  }, [couponCode, validateCoupon, calculateSubtotal]);
+
+        setIsApplyingCoupon(true)
+
+        try {
+            // First validate the coupon
+            const validateResult = await validateCoupon.mutateAsync({
+                code: couponCode.toUpperCase(),
+                orderAmount: calculateSubtotal
+            })
+
+            if (validateResult?.data?.success || validateResult?.success) {
+                // Then apply the coupon
+                const applyResult = await applyCoupon.mutateAsync({
+                    code: couponCode.toUpperCase(),
+                    orderAmount: calculateSubtotal
+                })
+
+                if (applyResult?.data?.success || applyResult?.success) {
+                    const responseData = applyResult.data?.data || applyResult.data || applyResult;
+                    const couponData = responseData.coupon || responseData;
+
+                    const applied = {
+                        code: couponData.code,
+                        discountAmount: responseData.discountAmount,
+                        name: couponData.name,
+                        discountType: couponData.discountType,
+                        discountValue: couponData.discountValue
+                    }
+                    
+                    setAppliedCoupon(applied)
+                    try { localStorage.setItem('appliedCoupon', JSON.stringify(applied)) } catch (e) { console.error('Storage error:', e) }
+                    // toast.success is already handled by useApplyCoupon hook's onSuccess
+                    setCouponCode('')
+                } else {
+                    toast.error(applyResult?.data?.message || applyResult?.message || 'Failed to apply coupon')
+                }
+            } else {
+                toast.error(validateResult?.data?.message || validateResult?.message || 'Invalid coupon code')
+            }
+            
+        } catch (err) {
+            console.error('Error applying coupon:', err)
+            // Error toast is handled by the hooks' onError
+        } finally {
+            setIsApplyingCoupon(false)
+        }
+  }, [couponCode, validateCoupon, applyCoupon, calculateSubtotal])
 
   // Handle remove coupon
   const handleRemoveCoupon = useCallback(() => {
@@ -211,7 +224,7 @@ const Cart = () => {
       try {
         const res = await validateCoupon.mutateAsync({
           code: appliedCoupon.code,
-          subtotal: calculateSubtotal,
+          orderAmount: calculateSubtotal,
         });
 
         if (res?.success) {
